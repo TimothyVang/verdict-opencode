@@ -27,25 +27,32 @@ Cosmetic / branding only — no behavioral changes to the agent engine:
 |---|---|---|
 | TUI wordmark | `packages/tui/src/logo.ts` | "opencode" block-art logo → **VERDICT** (two-tone: VER lilac / DICT cream) |
 | Terminal title | `packages/tui/src/app.tsx` | window/terminal title `OpenCode` and `OC \| …` → `VERDICT` / `VERDICT \| …` |
+| App-name strings | `packages/tui/src/{routes/session/permission,attention,feature-plugins/home/tips-view}`, `packages/opencode/src/{cli/cmd/run/*,cli/cmd/uninstall,acp/service,mcp/oauth-provider,plugin/*}` | user-facing self-references "OpenCode" → "VERDICT" (permission dialogs, splash, uninstall, ACP labels, MCP OAuth client name, exit/update messages) |
+| Auto-update off | `packages/opencode/src/cli/upgrade.ts` | update check hard-disabled — a fork must never pull upstream opencode releases (would overwrite the branded binary) |
 | Theme | `packages/tui` (via user theme) | pairs with the VERDICT opencode theme (`verdict-agent-harness/.opencode/themes/verdict.json`) |
 
-Service names that refer to real upstream services (e.g. "opencode Zen",
-"opencode Go") are intentionally left intact — this fork still uses them.
+Intentionally **left intact** (not cosmetic app chrome): real upstream service
+names ("opencode Zen", "opencode Go"), the `opencode serve`/`opencode.json`
+commands & config keys, HTTP-API doc strings and code identifiers
+(`OpenCodeHttpApi`), and the agent **system prompts** ("You are OpenCode …") —
+renaming the agent persona is a behavioral change, not branding.
+
+<p align="center"><img src=".verdict/tui-verdict-binary.png" alt="Compiled VERDICT binary" width="720"></p>
+<p align="center"><sub>The compiled standalone <code>verdict</code> binary — VERDICT wordmark + titlebar, no auto-update dialog.</sub></p>
 
 ## Build & run
 
-Same as upstream (Bun, no Go needed):
+Same as upstream (Bun ≥ 1.3.14, no Go needed):
 
 ```bash
 bun install
 # run from source:
 bun run --cwd packages/opencode --conditions=browser src/index.ts [project]
-# or the root dev script:
-bun run dev
-```
 
-To produce a standalone binary, use upstream's build script
-(`packages/opencode/script/build.ts`).
+# compile a standalone binary for the current platform:
+cd packages/opencode && bun run script/build.ts --single --skip-embed-web-ui
+# -> dist/opencode-<os>-<arch>/bin/opencode  (rename to `verdict`)
+```
 
 ## Re-syncing with upstream
 
