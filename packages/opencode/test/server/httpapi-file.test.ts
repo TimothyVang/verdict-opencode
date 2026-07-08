@@ -9,11 +9,13 @@ import { pollWithTimeout } from "../lib/effect"
 
 const context = Context.empty() as Context.Context<unknown>
 
-function request(route: string, directory: string, query?: Record<string, string>) {
+type QueryParams = Record<string, string | readonly string[]>
+
+function request(route: string, directory: string, query?: QueryParams) {
   const url = new URL(`http://localhost${route}`)
-  for (const [key, value] of Object.entries(query ?? {})) {
-    url.searchParams.set(key, value)
-  }
+  Object.entries(query ?? {}).forEach(([key, value]) =>
+    (Array.isArray(value) ? value : [value]).forEach((item) => url.searchParams.append(key, item)),
+  )
   return HttpApiApp.webHandler().handler(
     new Request(url, {
       headers: {
@@ -79,5 +81,34 @@ describe("file HttpApi", () => {
 
     expect(symbols.status).toBe(200)
     expect(await symbols.json()).toEqual([])
+  })
+
+  test("returns bad request for invalid route queries", async () => {
+    await using tmp = await tmpdir({ git: true })
+
+    const cases: Array<{ route: string; query?: QueryParams }> = [
+      { route: FilePaths.findText },
+      { route: FilePaths.findFile },
+      { route: FilePaths.findSymbol },
+      { route: FilePaths.list },
+      { route: FilePaths.content },
+      { route: FilePaths.status, query: { directory: [tmp.path, tmp.path] } },
+    ]
+    const responses = await Promise.all(cases.map((item) => request(item.route, tmp.path, item.query)))
+
+    await Promise.all(
+      responses.map(async (response, index) => {
+        expect(response.status, cases[index]!.route).toBe(400)
+        expect(await response.json()).toMatchObject({ name: "BadRequest" })
+      }),
+    )
+  })
+
+  test("rejects file content paths outside the routed directory", async () => {
+    await using tmp = await tmpdir({ git: true })
+
+    const response = await request(FilePaths.content, tmp.path, { path: "../outside.txt" })
+
+    expect(response.status).toBe(400)
   })
 })
