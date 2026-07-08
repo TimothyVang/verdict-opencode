@@ -37,6 +37,7 @@ describe("opencode run (non-interactive subprocess)", () => {
 
         const result = yield* opencode.run("use a tool", {
           extraArgs: ["--dangerously-skip-permissions"],
+          timeoutMs: 60_000,
         })
 
         opencode.expectExit(result, 0)
