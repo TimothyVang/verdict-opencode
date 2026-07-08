@@ -50,14 +50,16 @@ afterEach(async () => {
 })
 
 describe("package binary shim", () => {
-  test("passes verdict invocation name through to the runtime", async () => {
+  const unixTest = process.platform === "win32" ? test.skip : test
+
+  unixTest("passes verdict invocation name through to the runtime", async () => {
     const result = await runShim("verdict")
 
     expect(result.displayName).toBe("verdict")
     expect(result.argv).toEqual(["run", "--help"])
   })
 
-  test("does not overwrite an explicit display-name override", async () => {
+  unixTest("does not overwrite an explicit display-name override", async () => {
     const result = await runShim("verdict", { OPENCODE_CLI_NAME: "custom" })
 
     expect(result.displayName).toBe("custom")
