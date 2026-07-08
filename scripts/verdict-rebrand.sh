@@ -48,7 +48,7 @@ find "$OC_SRC" "$TUI_SRC" -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.t
 
 remaining="$(grep -roP '\bOpenCode\b(?! (?:Zen|Go)\b)' "$OC_SRC" "$TUI_SRC" \
   --include='*.ts' --include='*.tsx' --include='*.txt' 2>/dev/null \
-  | grep -v 'provider/provider.ts' | wc -l | tr -d ' ')"
+  | grep -v 'provider/provider.ts' | wc -l | tr -d ' ' || true)"
 
 echo "[verdict-rebrand] done. Remaining standalone 'OpenCode' (want 0, excludes billing header): $remaining"
 if [ "$remaining" != "0" ]; then
