@@ -245,6 +245,16 @@ describe("PublicApi OpenAPI v2 errors", () => {
     )
   })
 
+  test("documents legacy file route query errors", () => {
+    const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
+
+    for (const route of ["/find", "/find/file", "/find/symbol", "/file", "/file/content", "/file/status"]) {
+      expect(componentNames(spec.paths[route]?.get?.responses?.["400"]), route).toContain(
+        "effect_HttpApiError_BadRequest",
+      )
+    }
+  })
+
   test("documents v2 unfinished session mutation errors", () => {
     const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
 

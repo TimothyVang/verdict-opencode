@@ -2,7 +2,7 @@ import { FileSystem } from "@opencode-ai/core/filesystem"
 import { NonNegativeInt } from "@opencode-ai/core/schema"
 import { LSP } from "@/lsp/lsp"
 import { Schema } from "effect"
-import { HttpApi, HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/unstable/httpapi"
+import { HttpApi, HttpApiEndpoint, HttpApiError, HttpApiGroup, OpenApi } from "effect/unstable/httpapi"
 import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import {
@@ -108,6 +108,7 @@ export const FileApi = HttpApi.make("file")
         HttpApiEndpoint.get("findText", FilePaths.findText, {
           query: FindTextQuery,
           success: described(Schema.Array(LegacyMatch), "Matches"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "find.text",
@@ -118,6 +119,7 @@ export const FileApi = HttpApi.make("file")
         HttpApiEndpoint.get("findFile", FilePaths.findFile, {
           query: FindFileQuery,
           success: described(Schema.Array(Schema.String), "File paths"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "find.files",
@@ -128,6 +130,7 @@ export const FileApi = HttpApi.make("file")
         HttpApiEndpoint.get("findSymbol", FilePaths.findSymbol, {
           query: FindSymbolQuery,
           success: described(Schema.Array(LSP.Symbol), "Symbols"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "find.symbols",
@@ -138,6 +141,7 @@ export const FileApi = HttpApi.make("file")
         HttpApiEndpoint.get("list", FilePaths.list, {
           query: FileQuery,
           success: described(Schema.Array(LegacyEntry), "Files and directories"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "file.list",
@@ -148,6 +152,7 @@ export const FileApi = HttpApi.make("file")
         HttpApiEndpoint.get("content", FilePaths.content, {
           query: FileQuery,
           success: described(LegacyContent, "File content"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "file.read",
@@ -158,6 +163,7 @@ export const FileApi = HttpApi.make("file")
         HttpApiEndpoint.get("status", FilePaths.status, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(LegacyStatus), "File status"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "file.status",
