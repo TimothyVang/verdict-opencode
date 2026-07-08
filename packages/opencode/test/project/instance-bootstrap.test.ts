@@ -4,8 +4,9 @@ import path from "node:path"
 import { pathToFileURL } from "node:url"
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { CrossSpawnSpawner } from "@opencode-ai/core/cross-spawn-spawner"
-import { Cause, Effect, Exit, Fiber } from "effect"
+import { Cause, Effect, Exit, Fiber, Layer } from "effect"
 import { bootstrap as cliBootstrap } from "../../src/cli/bootstrap"
+import { InstanceState } from "../../src/effect/instance-state"
 import { InstanceBootstrap } from "../../src/project/bootstrap"
 import { InstanceStore } from "../../src/project/instance-store"
 import { disposeAllInstances, tmpdirScoped } from "../fixture/fixture"
@@ -15,6 +16,25 @@ import { waitGlobalBusEvent } from "../server/global-bus"
 const it = testEffect(
   LayerNode.compile(LayerNode.group([InstanceStore.node, CrossSpawnSpawner.node]), [
     [InstanceStore.bootstrapNode, InstanceBootstrap.node],
+  ]),
+)
+// The provide boundary only needs to prove InstanceStore runs the bootstrap
+// service before user effects. Keep it isolated from the slower full bootstrap
+// graph; the CLI/reload tests below still cover the real bootstrap wiring.
+const provideBoundaryIt = testEffect(
+  LayerNode.compile(LayerNode.group([InstanceStore.node, CrossSpawnSpawner.node]), [
+    [
+      InstanceStore.bootstrapNode,
+      Layer.succeed(
+        InstanceBootstrap.Service,
+        InstanceBootstrap.Service.of({
+          run: Effect.gen(function* () {
+            const ctx = yield* InstanceState.context
+            yield* Effect.promise(() => Bun.write(path.join(ctx.directory, "config-hook-fired"), "ran"))
+          }),
+        }),
+      ),
+    ],
   ]),
 )
 
@@ -30,9 +50,15 @@ afterEach(async () => {
   await disposeAllInstances()
 })
 
-const bootstrapFixture = Effect.gen(function* () {
+const markerFixture = Effect.gen(function* () {
   const dir = yield* tmpdirScoped({ git: true })
   const marker = path.join(dir, "config-hook-fired")
+  return { directory: dir, marker }
+})
+
+const bootstrapFixture = Effect.gen(function* () {
+  const fixture = yield* markerFixture
+  const { directory: dir, marker } = fixture
   const pluginFile = path.join(dir, "plugin.ts")
   yield* Effect.promise(() =>
     Bun.write(
@@ -57,7 +83,7 @@ const bootstrapFixture = Effect.gen(function* () {
       }),
     ),
   )
-  return { directory: dir, marker }
+  return fixture
 })
 
 function waitDisposed(directory: string) {
@@ -67,14 +93,17 @@ function waitDisposed(directory: string) {
   })
 }
 
-it.live("InstanceStore.provide runs InstanceBootstrap before effect", () =>
+provideBoundaryIt.live("InstanceStore.provide runs InstanceBootstrap before effect", () =>
   Effect.gen(function* () {
-    const tmp = yield* bootstrapFixture
+    const tmp = yield* markerFixture
     const store = yield* InstanceStore.Service
 
-    yield* store.provide({ directory: tmp.directory }, Effect.succeed("ok"))
-
-    expect(existsSync(tmp.marker)).toBe(true)
+    yield* store.provide(
+      { directory: tmp.directory },
+      Effect.sync(() => {
+        expect(existsSync(tmp.marker)).toBe(true)
+      }),
+    )
   }),
 )
 
