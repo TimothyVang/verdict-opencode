@@ -234,6 +234,17 @@ describe("PublicApi OpenAPI v2 errors", () => {
     }
   })
 
+  test("documents legacy session route errors", () => {
+    const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
+
+    expect(componentNames(spec.paths["/session"]?.get?.responses?.["400"])).toContain(
+      "effect_HttpApiError_BadRequest",
+    )
+    expect(componentNames(spec.paths["/session/{sessionID}/diff"]?.get?.responses?.["404"])).toContain(
+      "NotFoundError",
+    )
+  })
+
   test("documents v2 unfinished session mutation errors", () => {
     const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
 

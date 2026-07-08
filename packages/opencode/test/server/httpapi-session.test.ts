@@ -275,6 +275,10 @@ describe("session HttpApi", () => {
         expect(todo.status).toBe(404)
         expect(yield* responseJson(todo)).toEqual(missingSessionBody)
 
+        const diff = yield* request(pathFor(SessionPaths.diff, { sessionID: missingSession }), { headers })
+        expect(diff.status).toBe(404)
+        expect(yield* responseJson(diff)).toEqual(missingSessionBody)
+
         const messages = yield* request(pathFor(SessionPaths.messages, { sessionID: missingSession }), { headers })
         expect(messages.status).toBe(404)
         expect(yield* responseJson(messages)).toEqual(missingSessionBody)
