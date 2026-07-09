@@ -108,6 +108,7 @@ export const ExperimentalApi = HttpApi.make("experimental")
         HttpApiEndpoint.get("capabilities", ExperimentalPaths.capabilities, {
           query: WorkspaceRoutingQuery,
           success: described(CapabilitiesResponse, "Experimental capabilities"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.capabilities.get",
@@ -224,6 +225,7 @@ export const ExperimentalApi = HttpApi.make("experimental")
         HttpApiEndpoint.get("session", ExperimentalPaths.session, {
           query: SessionListQuery,
           success: described(Schema.Array(Session.GlobalInfo), "List of sessions"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.session.list",
@@ -248,6 +250,7 @@ export const ExperimentalApi = HttpApi.make("experimental")
         HttpApiEndpoint.get("resource", ExperimentalPaths.resource, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Record(Schema.String, MCP.Resource), "MCP resources"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.resource.list",
