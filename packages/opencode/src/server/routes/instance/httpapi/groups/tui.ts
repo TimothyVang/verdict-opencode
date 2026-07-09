@@ -68,6 +68,7 @@ export const TuiApi = HttpApi.make("tui")
         HttpApiEndpoint.post("openHelp", TuiPaths.openHelp, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Boolean, "Help dialog opened successfully"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.openHelp",
@@ -78,6 +79,7 @@ export const TuiApi = HttpApi.make("tui")
         HttpApiEndpoint.post("openSessions", TuiPaths.openSessions, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Boolean, "Session dialog opened successfully"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.openSessions",
@@ -88,6 +90,7 @@ export const TuiApi = HttpApi.make("tui")
         HttpApiEndpoint.post("openThemes", TuiPaths.openThemes, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Boolean, "Theme dialog opened successfully"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.openThemes",
@@ -98,6 +101,7 @@ export const TuiApi = HttpApi.make("tui")
         HttpApiEndpoint.post("openModels", TuiPaths.openModels, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Boolean, "Model dialog opened successfully"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.openModels",
@@ -108,6 +112,7 @@ export const TuiApi = HttpApi.make("tui")
         HttpApiEndpoint.post("submitPrompt", TuiPaths.submitPrompt, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Boolean, "Prompt submitted successfully"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.submitPrompt",
@@ -118,6 +123,7 @@ export const TuiApi = HttpApi.make("tui")
         HttpApiEndpoint.post("clearPrompt", TuiPaths.clearPrompt, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Boolean, "Prompt cleared successfully"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.clearPrompt",
@@ -141,6 +147,7 @@ export const TuiApi = HttpApi.make("tui")
           query: WorkspaceRoutingQuery,
           payload: TuiEvent.ToastShow.data,
           success: described(Schema.Boolean, "Toast notification shown successfully"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.showToast",
@@ -175,6 +182,7 @@ export const TuiApi = HttpApi.make("tui")
         HttpApiEndpoint.get("controlNext", TuiPaths.controlNext, {
           query: WorkspaceRoutingQuery,
           success: described(TuiRequestPayload, "Next TUI request"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.control.next",
@@ -186,6 +194,7 @@ export const TuiApi = HttpApi.make("tui")
           query: WorkspaceRoutingQuery,
           payload: Schema.Unknown,
           success: described(Schema.Boolean, "Response submitted successfully"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "tui.control.response",
