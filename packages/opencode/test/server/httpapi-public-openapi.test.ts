@@ -257,6 +257,90 @@ describe("PublicApi OpenAPI v2 errors", () => {
     })
   })
 
+  test("documents event subscribe BadRequest errors", () => {
+    const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
+
+    // Public OpenAPI rewrites pure HttpApi BadRequest to the legacy named shape.
+    expect(componentNames(spec.paths["/event"]?.get?.responses?.["400"])).toContain("BadRequestError")
+  })
+
+  test("documents provider list and auth BadRequest errors", () => {
+    const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
+
+    for (const route of ["/provider", "/provider/auth"]) {
+      expect(componentNames(spec.paths[route]?.get?.responses?.["400"]), route).toContain(
+        "effect_HttpApiError_BadRequest",
+      )
+    }
+  })
+
+  test("documents instance read and dispose BadRequest errors", () => {
+    const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
+
+    for (const route of [
+      ["post", "/instance/dispose"],
+      ["get", "/path"],
+      ["get", "/vcs"],
+      ["get", "/vcs/status"],
+      ["get", "/vcs/diff"],
+      ["get", "/vcs/diff/raw"],
+      ["get", "/command"],
+      ["get", "/agent"],
+      ["get", "/skill"],
+      ["get", "/lsp"],
+      ["get", "/formatter"],
+    ] as const) {
+      expect(componentNames(spec.paths[route[1]]?.[route[0]]?.responses?.["400"]), `${route[0]} ${route[1]}`).toContain(
+        "effect_HttpApiError_BadRequest",
+      )
+    }
+  })
+
+  test("documents tui route BadRequest errors", () => {
+    const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
+
+    for (const route of [
+      ["post", "/tui/append-prompt"],
+      ["post", "/tui/open-help"],
+      ["post", "/tui/open-sessions"],
+      ["post", "/tui/open-themes"],
+      ["post", "/tui/open-models"],
+      ["post", "/tui/submit-prompt"],
+      ["post", "/tui/clear-prompt"],
+      ["post", "/tui/execute-command"],
+      ["post", "/tui/show-toast"],
+      ["post", "/tui/publish"],
+      ["post", "/tui/select-session"],
+      ["get", "/tui/control/next"],
+      ["post", "/tui/control/response"],
+    ] as const) {
+      expect(componentNames(spec.paths[route[1]]?.[route[0]]?.responses?.["400"]), `${route[0]} ${route[1]}`).toContain(
+        "effect_HttpApiError_BadRequest",
+      )
+    }
+  })
+
+  test("documents experimental route BadRequest errors", () => {
+    const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
+
+    // Routes that declare HttpApiError.BadRequest and keep 400 in the public surface.
+    // Note: POST /experimental/console/switch is intentionally stripped by
+    // normalizeLegacyOperation for legacy SDK compatibility.
+    for (const route of [
+      ["get", "/experimental/capabilities"],
+      ["get", "/experimental/tool"],
+      ["get", "/experimental/tool/ids"],
+      ["get", "/experimental/session"],
+      ["post", "/experimental/session/{sessionID}/background"],
+      ["get", "/experimental/resource"],
+      ["post", "/experimental/project/{projectID}/copy/generate-name"],
+    ] as const) {
+      expect(componentNames(spec.paths[route[1]]?.[route[0]]?.responses?.["400"]), `${route[0]} ${route[1]}`).toContain(
+        "effect_HttpApiError_BadRequest",
+      )
+    }
+  })
+
   test("documents v2 unfinished session mutation errors", () => {
     const spec = OpenApi.fromApi(PublicApi) as OpenApiSpec
 
