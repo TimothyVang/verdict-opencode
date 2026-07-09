@@ -44,6 +44,26 @@ the client to providers' billing APIs).
 <p align="center"><img src=".verdict/tui-verdict-binary.png" alt="Compiled VERDICT binary" width="720"></p>
 <p align="center"><sub>The compiled standalone <code>verdict</code> binary — VERDICT wordmark + titlebar, no auto-update dialog.</sub></p>
 
+## Cloud console (optional)
+
+Upstream opencode ships an SST/Cloudflare **console** (`packages/console/*`,
+`infra/*`, `sst.config.ts`). This fork keeps that tree and adds:
+
+| Piece | Purpose |
+|---|---|
+| `infra/stage.ts` env overrides | `VERDICT_CLOUD_DOMAIN`, `VERDICT_CLOUD_ZONE_ID`, short domains |
+| `scripts/verdict-cloud-rebrand.sh` | Console/web marketing chrome → VERDICT |
+| `docs/CLOUD.md` | Deploy + privacy notes |
+
+**Not required for DFIR.** Local `verdict` binary + caseforge remains the product path.
+See **[docs/CLOUD.md](docs/CLOUD.md)** for full checklist.
+
+```bash
+bun run verdict:cloud-rebrand
+export VERDICT_CLOUD_DOMAIN=… VERDICT_CLOUD_ZONE_ID=…
+bun run dev:console   # UI only; full deploy needs SST secrets
+```
+
 ## Local LLM / Ollama OpenAI-compat
 
 caseforge drives this runtime with a custom `@ai-sdk/openai-compatible` provider

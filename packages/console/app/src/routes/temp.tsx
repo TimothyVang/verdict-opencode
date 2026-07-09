@@ -65,10 +65,8 @@ export default function Home() {
           <div data-slot="right">
             <button data-copy data-slot="command">
               <span>
-                <span>curl -fsSL </span>
-                <span data-slot="protocol">https://</span>
-                <span data-slot="highlight">opencode.ai/install</span>
-                <span> | bash</span>
+                <span>git clone </span>
+                <span data-slot="highlight">github.com/TimothyVang/verdict-opencode</span>
               </span>
               <CopyStatus />
             </button>
@@ -161,7 +159,7 @@ export default function Home() {
             <a href="https://x.com/opencode">{i18n.t("footer.x")}</a>
           </div>
           <div data-slot="cell">
-            <a href="https://github.com/anomalyco/opencode">{i18n.t("footer.github")}</a>
+            <a href="https://github.com/TimothyVang/verdict-opencode">{i18n.t("footer.github")}</a>
           </div>
           <div data-slot="cell">
             <a href="https://opencode.ai/discord">{i18n.t("footer.discord")}</a>
