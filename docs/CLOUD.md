@@ -33,6 +33,8 @@ A VERDICT deployment must use **VERDICT-owned** DNS, zone, and secrets.
 | `VERDICT_CLOUD_ZONE_ID` | Cloudflare zone ID for that domain |
 | `VERDICT_CLOUD_SHORT_DOMAIN` | Short link host (default `opncd.ai`) |
 | `VERDICT_CLOUD_SHORT_DOMAIN_DEV` | Dev short host |
+| `VITE_PUBLIC_BASE_URL` / `VERDICT_CLOUD_BASE_URL` | Console `config.baseUrl` for workspace/billing deep links |
+| `VERDICT_GITHUB_ORG` | GitHub org for desktop download redirects (default `TimothyVang`) |
 
 Example:
 

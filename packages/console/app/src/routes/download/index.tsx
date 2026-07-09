@@ -118,22 +118,32 @@ export default function Download() {
             <div data-component="section-content">
               <button
                 data-component="cli-row"
-                onClick={handleCopyClick("curl -fsSL https://github.com/TimothyVang/verdict-opencode | bash")}
+                onClick={handleCopyClick(
+                  "git clone https://github.com/TimothyVang/verdict-opencode.git && cd verdict-opencode && bun install",
+                )}
               >
                 <code>
-                  curl -fsSL https://<strong>opencode.ai/install</strong> | bash
+                  git clone https://github.com/<strong>TimothyVang/verdict-opencode</strong>
                 </code>
                 <CopyStatus />
               </button>
-              <button data-component="cli-row" onClick={handleCopyClick("npm i -g opencode-ai")}>
+              <button
+                data-component="cli-row"
+                onClick={handleCopyClick(
+                  "cd packages/opencode && bun run script/build.ts --single --skip-embed-web-ui",
+                )}
+              >
                 <code>
-                  npm i -g <strong>opencode-ai</strong>
+                  build: <strong>packages/opencode</strong> → verdict binary
                 </code>
                 <CopyStatus />
               </button>
-              <button data-component="cli-row" onClick={handleCopyClick("bun add -g opencode-ai")}>
+              <button
+                data-component="cli-row"
+                onClick={handleCopyClick("bun run --cwd packages/opencode --conditions=browser src/index.ts")}
+              >
                 <code>
-                  bun add -g <strong>opencode-ai</strong>
+                  run from source: <strong>bun run --cwd packages/opencode …</strong>
                 </code>
                 <CopyStatus />
               </button>

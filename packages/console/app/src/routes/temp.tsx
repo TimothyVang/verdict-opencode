@@ -65,10 +65,8 @@ export default function Home() {
           <div data-slot="right">
             <button data-copy data-slot="command">
               <span>
-                <span>curl -fsSL </span>
-                <span data-slot="protocol">https://</span>
-                <span data-slot="highlight">opencode.ai/install</span>
-                <span> | bash</span>
+                <span>git clone </span>
+                <span data-slot="highlight">github.com/TimothyVang/verdict-opencode</span>
               </span>
               <CopyStatus />
             </button>
