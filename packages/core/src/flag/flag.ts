@@ -75,4 +75,16 @@ export const Flag = {
   get OPENCODE_CLIENT() {
     return process.env["OPENCODE_CLIENT"] ?? "cli"
   },
+  /**
+   * When `OPENCODE_TOOL_CHOICE=required` (or `VERDICT_FORCE_TOOL_CHOICE=1`),
+   * non-final agent steps send OpenAI-compatible `tool_choice: "required"`
+   * so local models cannot answer with prose/JSON instead of tool calls.
+   * Final step still forces `none` (max-steps exit).
+   */
+  get OPENCODE_TOOL_CHOICE() {
+    const raw = (process.env["OPENCODE_TOOL_CHOICE"] ?? "").toLowerCase()
+    if (raw === "required" || raw === "auto" || raw === "none") return raw
+    if (truthy("VERDICT_FORCE_TOOL_CHOICE")) return "required"
+    return undefined
+  },
 }

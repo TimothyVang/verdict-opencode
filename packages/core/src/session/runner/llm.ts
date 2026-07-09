@@ -11,6 +11,7 @@ import {
 import { Cause, DateTime, Effect, FiberSet, Layer, Option, Semaphore, Stream } from "effect"
 import { AgentV2 } from "../../agent"
 import { Config } from "../../config"
+import { Flag } from "../../flag/flag"
 import { Database } from "../../database/database"
 import { EventV2 } from "../../event"
 import { Location } from "../../location"
@@ -205,7 +206,17 @@ const layer = Layer.effect(
           .map(SystemPart.make),
         messages: [...toLLMMessages(context, model), ...(isLastStep ? [Message.assistant(MAX_STEPS_PROMPT)] : [])],
         tools: toolMaterialization?.definitions ?? [],
-        toolChoice: isLastStep ? "none" : undefined,
+        // Default: auto (undefined). OPENCODE_TOOL_CHOICE=required forces tool
+        // calls on non-final steps so weak local models cannot print JSON prose.
+        toolChoice: isLastStep
+          ? "none"
+          : Flag.OPENCODE_TOOL_CHOICE === "required"
+            ? "required"
+            : Flag.OPENCODE_TOOL_CHOICE === "none"
+              ? "none"
+              : Flag.OPENCODE_TOOL_CHOICE === "auto"
+                ? "auto"
+                : undefined,
       })
       if (yield* compaction.compactIfNeeded({ sessionID: session.id, entries, model, request }))
         return yield* Effect.die(continueAfterCompaction(currentStep))
