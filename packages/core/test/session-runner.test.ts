@@ -2552,7 +2552,10 @@ describe("SessionRunnerLLM", () => {
             {
               type: "tool",
               id: "call-missing",
-              state: { status: "error", error: { message: "Unknown tool: missing" } },
+              state: {
+                status: "error",
+                error: { message: expect.stringMatching(/^Unknown tool: missing\./) },
+              },
             },
           ],
         },
@@ -2806,6 +2809,57 @@ describe("SessionRunnerLLM", () => {
           ],
         },
       ])
+    }),
+  )
+
+  it.effect("forces tool_choice required on non-final steps when OPENCODE_TOOL_CHOICE=required", () =>
+    Effect.gen(function* () {
+      const prev = process.env["OPENCODE_TOOL_CHOICE"]
+      const prevForce = process.env["VERDICT_FORCE_TOOL_CHOICE"]
+      process.env["OPENCODE_TOOL_CHOICE"] = "required"
+      delete process.env["VERDICT_FORCE_TOOL_CHOICE"]
+      try {
+        yield* setup
+        const agents = yield* AgentV2.Service
+        yield* agents.transform((editor) =>
+          editor.update(AgentV2.ID.make("build"), (agent) => {
+            agent.steps = 2
+          }),
+        )
+        const session = yield* SessionV2.Service
+        yield* session.prompt({ sessionID, prompt: Prompt.make({ text: "Require tools" }), resume: false })
+
+        requests.length = 0
+        executions.length = 0
+        responses = [
+          [
+            LLMEvent.stepStart({ index: 0 }),
+            LLMEvent.toolCall({ id: "call-required", name: "echo", input: { text: "done" } }),
+            LLMEvent.stepFinish({ index: 0, reason: "tool-calls" }),
+            LLMEvent.finish({ reason: "tool-calls" }),
+          ],
+          [
+            LLMEvent.stepStart({ index: 0 }),
+            LLMEvent.textStart({ id: "text-final" }),
+            LLMEvent.textDelta({ id: "text-final", text: "Done" }),
+            LLMEvent.textEnd({ id: "text-final" }),
+            LLMEvent.stepFinish({ index: 0, reason: "stop" }),
+            LLMEvent.finish({ reason: "stop" }),
+          ],
+        ]
+
+        yield* session.resume(sessionID)
+
+        expect(requests).toHaveLength(2)
+        expect(requests[0]?.toolChoice).toMatchObject({ type: "required" })
+        expect(requests[1]?.toolChoice).toMatchObject({ type: "none" })
+        expect(executions).toEqual(["done"])
+      } finally {
+        if (prev === undefined) delete process.env["OPENCODE_TOOL_CHOICE"]
+        else process.env["OPENCODE_TOOL_CHOICE"] = prev
+        if (prevForce === undefined) delete process.env["VERDICT_FORCE_TOOL_CHOICE"]
+        else process.env["VERDICT_FORCE_TOOL_CHOICE"] = prevForce
+      }
     }),
   )
 

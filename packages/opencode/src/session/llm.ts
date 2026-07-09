@@ -301,11 +301,20 @@ const live: Layer.Layer<
                 toolName: lower,
               }
             }
+            // Surface a short available-tool list so weak local models can
+            // self-correct instead of looping on invented names until timeout.
+            const available = Object.keys(prepared.tools)
+              .filter((name) => name !== "invalid")
+              .slice(0, 48)
+            const hint =
+              available.length > 0
+                ? ` Available tools (${available.length}): ${available.join(", ")}`
+                : ""
             return {
               ...failed.toolCall,
               input: JSON.stringify({
                 tool: failed.toolCall.toolName,
-                error: failed.error.message,
+                error: `${failed.error.message}.${hint}`,
               }),
               toolName: "invalid",
             }
