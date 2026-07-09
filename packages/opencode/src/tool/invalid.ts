@@ -14,7 +14,9 @@ export const InvalidTool = Tool.define(
     execute: (params: { tool: string; error: string }) =>
       Effect.succeed({
         title: "Invalid Tool",
-        output: `The arguments provided to the tool are invalid: ${params.error}`,
+        // Used for both unknown tool names (via experimental_repairToolCall) and
+        // schema failures — tell the model to retry with an exact advertised name.
+        output: `Tool call rejected for "${params.tool}": ${params.error}. Use an exact available tool name with valid arguments; do not invent tool names.`,
         metadata: {},
       }),
   }),
