@@ -29,6 +29,7 @@ import * as OtelTracer from "@effect/opentelemetry/Tracer"
 import { LLMAISDK } from "./llm/ai-sdk"
 import { LLMNativeRuntime } from "./llm/native-runtime"
 import { LLMRequestPrep } from "./llm/request"
+import { isInternalRepairTool, repairFailedToolCall } from "./llm/tool-repair"
 
 export const OUTPUT_TOKEN_MAX = ProviderTransform.OUTPUT_TOKEN_MAX
 
@@ -294,36 +295,20 @@ const live: Layer.Layer<
           // Copilot returns the authoritative billed amount only in provider-specific response fields.
           includeRawChunks: input.model.providerID.includes("github-copilot"),
           async experimental_repairToolCall(failed) {
-            const lower = failed.toolCall.toolName.toLowerCase()
-            if (lower !== failed.toolCall.toolName && prepared.tools[lower]) {
-              return {
-                ...failed.toolCall,
-                toolName: lower,
-              }
-            }
-            // Surface a short available-tool list so weak local models can
-            // self-correct instead of looping on invented names until timeout.
-            const available = Object.keys(prepared.tools)
-              .filter((name) => name !== "invalid")
-              .slice(0, 48)
-            const hint =
-              available.length > 0
-                ? ` Available tools (${available.length}): ${available.join(", ")}`
-                : ""
-            return {
-              ...failed.toolCall,
-              input: JSON.stringify({
-                tool: failed.toolCall.toolName,
-                error: `${failed.error.message}.${hint}`,
-              }),
-              toolName: "invalid",
-            }
+            // Remap separator/case drift onto real tools; else route to internal
+            // `invalid` sink (kept under DFIR deny-all — see LLMRequestPrep).
+            return repairFailedToolCall({
+              toolCall: failed.toolCall,
+              tools: prepared.tools,
+              errorMessage: failed.error.message,
+            })
           },
           temperature: prepared.params.temperature,
           topP: prepared.params.topP,
           topK: prepared.params.topK,
           providerOptions: ProviderTransform.providerOptions(input.model, prepared.params.options),
-          activeTools: Object.keys(prepared.tools).filter((x) => x !== "invalid"),
+          // Hide internal repair sink from the model; keep it in `tools` for execute.
+          activeTools: Object.keys(prepared.tools).filter((x) => !isInternalRepairTool(x)),
           tools: prepared.tools,
           toolChoice: input.toolChoice,
           maxOutputTokens: prepared.params.maxOutputTokens,

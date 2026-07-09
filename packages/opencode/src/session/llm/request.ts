@@ -210,7 +210,14 @@ function resolveTools(input: Pick<PrepareInput, "tools" | "agent" | "permission"
     Object.keys(input.tools),
     Permission.merge(input.agent.permission, input.permission ?? []),
   )
-  return Record.filter(input.tools, (_, k) => input.user.tools?.[k] !== false && !disabled.has(k))
+  // Keep the internal `invalid` repair sink even under DFIR `"*": "deny"` profiles.
+  // activeTools still hides it from the model; experimental_repairToolCall needs it
+  // executable so unknown names become a tool-result retry hint instead of
+  // "unavailable tool 'invalid'".
+  return Record.filter(
+    input.tools,
+    (_, k) => k === "invalid" || (input.user.tools?.[k] !== false && !disabled.has(k)),
+  )
 }
 
 export function hasToolCalls(messages: ModelMessage[]): boolean {
