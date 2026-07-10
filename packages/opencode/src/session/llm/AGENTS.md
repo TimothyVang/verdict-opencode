@@ -86,5 +86,22 @@ Safety boundary:
 
 - AI SDK remains the default.
 - `OPENCODE_EXPERIMENTAL_NATIVE_LLM=true` or the umbrella `OPENCODE_EXPERIMENTAL=true` opts in. Native is not a global replacement.
-- Native execution currently supports OpenAI, opencode-managed OpenAI-compatible, and Anthropic API-key paths backed by `@ai-sdk/openai`, `@ai-sdk/openai-compatible`, or `@ai-sdk/anthropic` catalog entries.
-- Unsupported providers, OpenAI OAuth, and missing API-key cases fall back to AI SDK.
+- The native gate is npm-package based and must stay aligned with what `native-request.ts` can lower. API-key paths currently supported:
+
+  | Catalog npm | Native facade / route | Notes |
+  |---|---|---|
+  | `@ai-sdk/openai` | OpenAI Responses | OpenAI OAuth + plugin `fetch` override also native |
+  | `@ai-sdk/anthropic` | Anthropic Messages | API key |
+  | `@ai-sdk/google` | Gemini | API key |
+  | `@ai-sdk/azure` | Azure OpenAI Responses | Requires base URL (resource endpoint) |
+  | `@ai-sdk/amazon-bedrock` | Bedrock Converse | API key bearer path only (no SigV4 wiring here) |
+  | `@openrouter/ai-sdk-provider` | OpenRouter | API key |
+  | `@ai-sdk/openai-compatible` | OpenAI-compatible Chat | Requires base URL (e.g. Ollama `http://host:11434/v1`) |
+  | `@ai-sdk/xai` | XAI Responses | API key only |
+
+- Explicit AI SDK fallback (fail-closed):
+  - Missing API key
+  - Missing base URL for openai-compatible or Azure
+  - Unsupported npm package
+  - OAuth without an OpenAI plugin `fetch` override
+  - **xAI OAuth** always — plugin fetch refresh/bearer injection is the AI-SDK contract; do not force native OAuth for xAI even when `options.fetch` is present
