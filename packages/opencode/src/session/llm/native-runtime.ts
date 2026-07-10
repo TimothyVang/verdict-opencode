@@ -47,27 +47,54 @@ export function status(input: Pick<StreamInput, "model" | "provider" | "auth">):
   return statusWithFetch(input, providerFetch(input))
 }
 
+/** npm packages that `native-request.ts` can lower into executable `@opencode-ai/llm` models. */
+const NATIVE_NPM = new Set([
+  "@ai-sdk/openai",
+  "@ai-sdk/openai-compatible",
+  "@ai-sdk/anthropic",
+  "@ai-sdk/google",
+  "@ai-sdk/azure",
+  "@ai-sdk/amazon-bedrock",
+  "@openrouter/ai-sdk-provider",
+  "@ai-sdk/xai",
+])
+
+/** Packages whose route has no canonical host and must receive an explicit base URL. */
+const REQUIRES_BASE_URL = new Set(["@ai-sdk/openai-compatible", "@ai-sdk/azure"])
+
 function statusWithFetch(
   input: Pick<StreamInput, "model" | "provider" | "auth">,
   fetch: typeof globalThis.fetch | undefined,
 ): RuntimeStatus {
-  const providerID = input.model.providerID
-  if (providerID !== "openai" && providerID !== "anthropic" && !providerID.startsWith("opencode"))
-    return { type: "unsupported", reason: "provider is not openai, opencode, or anthropic" }
   const npm = input.model.api.npm
-  if (npm !== "@ai-sdk/openai" && npm !== "@ai-sdk/openai-compatible" && npm !== "@ai-sdk/anthropic")
-    return { type: "unsupported", reason: "provider package is not OpenAI, OpenAI-compatible, or Anthropic" }
-  if (input.auth?.type === "oauth" && !(input.provider.id === "openai" && fetch)) {
-    return { type: "unsupported", reason: "OAuth auth requires a provider fetch override" }
+  if (!NATIVE_NPM.has(npm))
+    return { type: "unsupported", reason: `provider package is not natively supported: ${npm}` }
+
+  // OAuth policy:
+  // - OpenAI OAuth + codex plugin `fetch` override can stay on the native path.
+  // - xAI OAuth intentionally falls back to AI SDK: the plugin fetch owns token
+  //   refresh and bearer injection as the AI-SDK contract, not native Auth.
+  // - All other OAuth without an OpenAI fetch override falls back fail-closed.
+  if (input.auth?.type === "oauth") {
+    if (input.provider.id === "xai")
+      return { type: "unsupported", reason: "xAI OAuth uses AI SDK plugin fetch override" }
+    if (!(input.provider.id === "openai" && fetch))
+      return { type: "unsupported", reason: "OAuth auth requires a provider fetch override" }
   }
 
   const apiKey = typeof input.provider.options.apiKey === "string" ? input.provider.options.apiKey : input.provider.key
   if (!apiKey) return { type: "unsupported", reason: "API key is not configured" }
 
+  const baseURL =
+    typeof input.provider.options.baseURL === "string"
+      ? input.provider.options.baseURL
+      : input.model.api.url || undefined
+  if (REQUIRES_BASE_URL.has(npm) && !baseURL) return { type: "unsupported", reason: "base URL is not configured" }
+
   return {
     type: "supported",
     apiKey,
-    baseURL: typeof input.provider.options.baseURL === "string" ? input.provider.options.baseURL : undefined,
+    baseURL,
   }
 }
 
