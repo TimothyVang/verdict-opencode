@@ -246,9 +246,11 @@ const live: Layer.Layer<
             "llm.runtime": "native",
             "llm.provider": input.model.providerID,
             "llm.model": input.model.id,
+            "llm.used_fallback": native.used_fallback,
           })
           return {
             type: "native" as const,
+            used_fallback: native.used_fallback,
             stream: native.stream,
           }
         }
@@ -257,6 +259,7 @@ const live: Layer.Layer<
           "llm.provider": input.model.providerID,
           "llm.model": input.model.id,
           "llm.native_unsupported_reason": native.reason,
+          "llm.used_fallback": native.used_fallback,
         })
         yield* Effect.logInfo("native runtime unavailable; falling back to ai-sdk", {
           providerID: input.model.providerID,
@@ -266,6 +269,7 @@ const live: Layer.Layer<
           agent: input.agent.name,
           mode: input.agent.mode,
           reason: native.reason,
+          used_fallback: native.used_fallback,
         })
       }
 
@@ -273,11 +277,15 @@ const live: Layer.Layer<
         "llm.runtime": "ai-sdk",
         "llm.provider": input.model.providerID,
         "llm.model": input.model.id,
+        "llm.used_fallback": true,
       })
       // Default runtime path: AI SDK owns provider execution and tool dispatch;
       // LLMAISDK.toLLMEvents below normalizes fullStream parts for the processor.
+      // used_fallback is true whenever this path runs (native gate rejected, or
+      // native not opted in). Downstream reads this field rather than inventing it.
       return {
         type: "ai-sdk" as const,
+        used_fallback: true as const,
         result: streamText({
           onError(error) {
             bridge.fork(
