@@ -20,11 +20,15 @@ import type { LLMClientShape } from "@opencode-ai/llm/route"
 import { LLMNative } from "./native-request"
 
 export type RuntimeStatus =
-  | { readonly type: "supported"; readonly apiKey: string; readonly baseURL?: string }
-  | { readonly type: "unsupported"; readonly reason: string }
+  | { readonly type: "supported"; readonly apiKey: string; readonly baseURL?: string; readonly used_fallback: false }
+  | { readonly type: "unsupported"; readonly reason: string; readonly used_fallback: true }
 export type StreamResult =
-  | { readonly type: "supported"; readonly stream: Stream.Stream<LLMEvent, unknown> }
-  | { readonly type: "unsupported"; readonly reason: string }
+  | {
+      readonly type: "supported"
+      readonly stream: Stream.Stream<LLMEvent, unknown>
+      readonly used_fallback: false
+    }
+  | { readonly type: "unsupported"; readonly reason: string; readonly used_fallback: true }
 
 type StreamInput = {
   readonly model: Provider.Model
@@ -68,7 +72,7 @@ function statusWithFetch(
 ): RuntimeStatus {
   const npm = input.model.api.npm
   if (!NATIVE_NPM.has(npm))
-    return { type: "unsupported", reason: `provider package is not natively supported: ${npm}` }
+    return unsupported(`provider package is not natively supported: ${npm}`)
 
   // OAuth policy:
   // - OpenAI OAuth + codex plugin `fetch` override can stay on the native path.
@@ -76,26 +80,32 @@ function statusWithFetch(
   //   refresh and bearer injection as the AI-SDK contract, not native Auth.
   // - All other OAuth without an OpenAI fetch override falls back fail-closed.
   if (input.auth?.type === "oauth") {
-    if (input.provider.id === "xai")
-      return { type: "unsupported", reason: "xAI OAuth uses AI SDK plugin fetch override" }
+    if (input.provider.id === "xai") return unsupported("xAI OAuth uses AI SDK plugin fetch override")
     if (!(input.provider.id === "openai" && fetch))
-      return { type: "unsupported", reason: "OAuth auth requires a provider fetch override" }
+      return unsupported("OAuth auth requires a provider fetch override")
   }
 
   const apiKey = typeof input.provider.options.apiKey === "string" ? input.provider.options.apiKey : input.provider.key
-  if (!apiKey) return { type: "unsupported", reason: "API key is not configured" }
+  if (!apiKey) return unsupported("API key is not configured")
 
   const baseURL =
     typeof input.provider.options.baseURL === "string"
       ? input.provider.options.baseURL
       : input.model.api.url || undefined
-  if (REQUIRES_BASE_URL.has(npm) && !baseURL) return { type: "unsupported", reason: "base URL is not configured" }
+  if (REQUIRES_BASE_URL.has(npm) && !baseURL) return unsupported("base URL is not configured")
 
   return {
     type: "supported",
     apiKey,
     baseURL,
+    used_fallback: false,
   }
+}
+
+function unsupported(reason: string): RuntimeStatus {
+  // used_fallback is the runtime source of truth for AI SDK fallback: true only
+  // when this gate rejects native so the session LLM layer takes the AI SDK path.
+  return { type: "unsupported", reason, used_fallback: true }
 }
 
 export function stream(input: StreamInput): StreamResult {

@@ -567,7 +567,7 @@ describe("session.llm-native.request", () => {
         provider: { ...providerInfo, options: {} },
         auth: undefined,
       }),
-    ).toEqual({ type: "unsupported", reason: "API key is not configured" })
+    ).toEqual({ type: "unsupported", reason: "API key is not configured", used_fallback: true })
 
     expect(
       LLMNativeRuntime.status({
@@ -580,7 +580,7 @@ describe("session.llm-native.request", () => {
         provider: catalogProvider({ id: "ollama", apiKey: "ollama" }),
         auth: undefined,
       }),
-    ).toEqual({ type: "unsupported", reason: "base URL is not configured" })
+    ).toEqual({ type: "unsupported", reason: "base URL is not configured", used_fallback: true })
 
     expect(
       LLMNativeRuntime.status({
@@ -588,7 +588,7 @@ describe("session.llm-native.request", () => {
         provider: catalogProvider({ id: "azure", apiKey: "test-azure-key" }),
         auth: undefined,
       }),
-    ).toEqual({ type: "unsupported", reason: "base URL is not configured" })
+    ).toEqual({ type: "unsupported", reason: "base URL is not configured", used_fallback: true })
 
     expect(
       LLMNativeRuntime.status({
@@ -599,6 +599,80 @@ describe("session.llm-native.request", () => {
     ).toMatchObject({ type: "unsupported" })
   })
 
+  test("run result records used_fallback false for native and true for AI SDK fallback", () => {
+    // Source of truth for caseforge/downstream: native gate emits used_fallback so
+    // callers never invent the value. Native path → false; AI SDK fallback → true.
+    const native = LLMNativeRuntime.status({
+      model: baseModel,
+      provider: providerInfo,
+      auth: undefined,
+    })
+    expect(native).toMatchObject({ type: "supported", used_fallback: false })
+    expect(typeof (native as { used_fallback?: unknown }).used_fallback).toBe("boolean")
+
+    const missingKey = LLMNativeRuntime.status({
+      model: baseModel,
+      provider: { ...providerInfo, options: {} },
+      auth: undefined,
+    })
+    expect(missingKey).toEqual({
+      type: "unsupported",
+      reason: "API key is not configured",
+      used_fallback: true,
+    })
+
+    const missingBaseURL = LLMNativeRuntime.status({
+      model: catalogModel({
+        providerID: "ollama",
+        npm: "@ai-sdk/openai-compatible",
+        url: "",
+        id: "llama3.2",
+      }),
+      provider: catalogProvider({ id: "ollama", apiKey: "ollama" }),
+      auth: undefined,
+    })
+    expect(missingBaseURL).toMatchObject({ type: "unsupported", used_fallback: true })
+
+    const unknownPackage = LLMNativeRuntime.status({
+      model: catalogModel({ providerID: "custom", npm: "unknown-provider" }),
+      provider: catalogProvider({ id: "custom", apiKey: "key" }),
+      auth: undefined,
+    })
+    expect(unknownPackage).toMatchObject({ type: "unsupported", used_fallback: true })
+
+    // stream() must carry the same field on both supported and unsupported results.
+    const client = {
+      stream: () => Stream.empty,
+    } as unknown as LLMClientShape
+    const supportedStream = LLMNativeRuntime.stream({
+      model: baseModel,
+      provider: providerInfo,
+      auth: undefined,
+      llmClient: client,
+      messages: [],
+      tools: {},
+      headers: {},
+      abort: new AbortController().signal,
+    })
+    expect(supportedStream).toMatchObject({ type: "supported", used_fallback: false })
+
+    const fallbackStream = LLMNativeRuntime.stream({
+      model: baseModel,
+      provider: { ...providerInfo, options: {} },
+      auth: undefined,
+      llmClient: client,
+      messages: [],
+      tools: {},
+      headers: {},
+      abort: new AbortController().signal,
+    })
+    expect(fallbackStream).toMatchObject({
+      type: "unsupported",
+      reason: "API key is not configured",
+      used_fallback: true,
+    })
+  })
+
   test("falls back for OAuth and custom-fetch providers that are AI-SDK contracts", () => {
     expect(
       LLMNativeRuntime.status({
@@ -606,7 +680,11 @@ describe("session.llm-native.request", () => {
         provider: providerInfo,
         auth: { type: "oauth", refresh: "refresh", access: "access", expires: 1 },
       }),
-    ).toEqual({ type: "unsupported", reason: "OAuth auth requires a provider fetch override" })
+    ).toEqual({
+      type: "unsupported",
+      reason: "OAuth auth requires a provider fetch override",
+      used_fallback: true,
+    })
 
     // OpenAI OAuth with the codex plugin fetch override can stay on the native path.
     const dummyFetch = Object.assign(async () => new Response(), {
@@ -619,7 +697,7 @@ describe("session.llm-native.request", () => {
         provider: { ...providerInfo, options: { apiKey: OAUTH_DUMMY_KEY, fetch: dummyFetch } },
         auth: { type: "oauth", refresh: "refresh", access: "access", expires: 1 },
       }),
-    ).toMatchObject({ type: "supported", apiKey: OAUTH_DUMMY_KEY })
+    ).toMatchObject({ type: "supported", apiKey: OAUTH_DUMMY_KEY, used_fallback: false })
 
     // xAI OAuth intentionally stays on AI SDK: plugin fetch owns refresh + bearer injection.
     expect(
@@ -632,7 +710,11 @@ describe("session.llm-native.request", () => {
         }),
         auth: { type: "oauth", refresh: "refresh", access: "access", expires: 1 },
       }),
-    ).toEqual({ type: "unsupported", reason: "xAI OAuth uses AI SDK plugin fetch override" })
+    ).toEqual({
+      type: "unsupported",
+      reason: "xAI OAuth uses AI SDK plugin fetch override",
+      used_fallback: true,
+    })
   })
 
   test("enables native runtime for Anthropic API-key models", () => {
