@@ -294,13 +294,33 @@ const live: Layer.Layer<
           // Copilot returns the authoritative billed amount only in provider-specific response fields.
           includeRawChunks: input.model.providerID.includes("github-copilot"),
           async experimental_repairToolCall(failed) {
-            const lower = failed.toolCall.toolName.toLowerCase()
-            if (lower !== failed.toolCall.toolName && prepared.tools[lower]) {
+            const name = failed.toolCall.toolName
+            const lower = name.toLowerCase()
+            if (lower !== name && prepared.tools[lower]) {
               return {
                 ...failed.toolCall,
                 toolName: lower,
               }
             }
+            // Normalize common local-LLM / MCP naming drift before giving up.
+            const normalized = name
+              .replaceAll("findevil_mcp_", "findevil-mcp_")
+              .replaceAll("findevil_agent_mcp_", "findevil-agent-mcp_")
+              .replaceAll("findevil-mcp-agent-mcp_", "findevil-agent-mcp_")
+            if (normalized !== name && prepared.tools[normalized]) {
+              return {
+                ...failed.toolCall,
+                toolName: normalized,
+              }
+            }
+            if (prepared.tools[lower.replaceAll("_", "-")]) {
+              return {
+                ...failed.toolCall,
+                toolName: lower.replaceAll("_", "-"),
+              }
+            }
+            // Keep toolName "invalid" so InvalidTool can return a structured error.
+            // activeTools MUST include "invalid" or the SDK reports "unavailable tool 'invalid'".
             return {
               ...failed.toolCall,
               input: JSON.stringify({
@@ -314,7 +334,8 @@ const live: Layer.Layer<
           topP: prepared.params.topP,
           topK: prepared.params.topK,
           providerOptions: ProviderTransform.providerOptions(input.model, prepared.params.options),
-          activeTools: Object.keys(prepared.tools).filter((x) => x !== "invalid"),
+          // Include "invalid" so experimental_repairToolCall can execute; description says do not use.
+          activeTools: Object.keys(prepared.tools),
           tools: prepared.tools,
           toolChoice: input.toolChoice,
           maxOutputTokens: prepared.params.maxOutputTokens,

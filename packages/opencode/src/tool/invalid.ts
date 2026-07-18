@@ -9,12 +9,16 @@ export const Parameters = Schema.Struct({
 export const InvalidTool = Tool.define(
   "invalid",
   Effect.succeed({
-    description: "Do not use",
+    description:
+      "Internal repair only — models must never choose this tool. Use exact findevil-mcp_* / findevil-agent-mcp_* names.",
     parameters: Parameters,
     execute: (params: { tool: string; error: string }) =>
       Effect.succeed({
         title: "Invalid Tool",
-        output: `The arguments provided to the tool are invalid: ${params.error}`,
+        output:
+          `Tool call failed for '${params.tool}': ${params.error}. ` +
+          `Retry with an exact available tool name (findevil-mcp_* or findevil-agent-mcp_* only). ` +
+          `Do not call a tool named invalid.`,
         metadata: {},
       }),
   }),
