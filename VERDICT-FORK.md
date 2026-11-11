@@ -44,6 +44,46 @@ the client to providers' billing APIs).
 <p align="center"><img src=".verdict/tui-verdict-binary.png" alt="Compiled VERDICT binary" width="720"></p>
 <p align="center"><sub>The compiled standalone <code>verdict</code> binary — VERDICT wordmark + titlebar, no auto-update dialog.</sub></p>
 
+## Cloud console (optional)
+
+Upstream opencode ships an SST/Cloudflare **console** (`packages/console/*`,
+`infra/*`, `sst.config.ts`). This fork keeps that tree and adds:
+
+| Piece | Purpose |
+|---|---|
+| `infra/stage.ts` env overrides | `VERDICT_CLOUD_DOMAIN`, `VERDICT_CLOUD_ZONE_ID`, short domains |
+| `scripts/verdict-cloud-rebrand.sh` | Console/web marketing chrome → VERDICT |
+| `docs/CLOUD.md` | Deploy + privacy notes |
+
+**Not required for DFIR.** Local `verdict` binary + caseforge remains the product path.
+See **[docs/CLOUD.md](docs/CLOUD.md)** for full checklist.
+
+```bash
+bun run verdict:cloud-rebrand
+export VERDICT_CLOUD_DOMAIN=… VERDICT_CLOUD_ZONE_ID=…
+bun run dev:console   # UI only; full deploy needs SST secrets
+```
+
+## Local LLM / Ollama OpenAI-compat
+
+caseforge drives this runtime with a custom `@ai-sdk/openai-compatible` provider
+whose `options.baseURL` is `VERDICT_LLM_BASEURL`. The SDK POSTs
+`${baseURL}/chat/completions`.
+
+| `VERDICT_LLM_BASEURL` | Request path | Typical Ollama response |
+|---|---|---|
+| `http://host:11434/v1` | `/v1/chat/completions` | OpenAI-shaped JSON (success or `model … not found`) |
+| `http://host:11434` (no `/v1`) | `/chat/completions` | plain `404 page not found` |
+
+This fork does **not** rewrite bare Ollama roots — missing `/v1` is a caller
+config issue (normalize in caseforge / env). Residual checks:
+
+```bash
+bash scripts/check-httpapi-error-contracts.sh   # always offline
+# optional live probe (SKIP when host unset/down):
+VERDICT_LLM_BASEURL=http://host:11434/v1 bash scripts/check-ollama-openai-compat.sh
+```
+
 ## Build & run
 
 Same as upstream (Bun ≥ 1.3.14, no Go needed):

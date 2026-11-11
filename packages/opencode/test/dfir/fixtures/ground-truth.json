@@ -1,0 +1,42 @@
+{
+  "schema": "dfir-scorecard-ground-truth/v1",
+  "source": "dgx-spark-lab docs/dfir-detection-scorecard.md, checkpoint 2026-07-09",
+  "notes": [
+    "Per-EVTX expected MITRE ATT&CK techniques + CVEs for the offline Spark battery.",
+    "Single-source EVTX findings stay HYPOTHESIS/INFERRED and case verdicts stay",
+    "INDETERMINATE by design, so the headline metric is technique elevation, not the",
+    "verdict string. HIT = technique in attack_coverage.observed_techniques or a finding;",
+    "PARTIAL = signal in audit/timeline but no finding elevated; MISS = not observed."
+  ],
+  "verdict_bands": ["SUSPICIOUS", "INDETERMINATE", "NO_EVIL"],
+  "cases": {
+    "win-lateral-movement": {
+      "host": "WIN-77LTAPHIQ1R",
+      "expected_verdict_band": "INDETERMINATE",
+      "evtx": {
+        "LM_WMI_4624_4688_TargetHost.evtx": { "event_ids": [4624, 4688], "techniques": ["T1047"], "cves": [] },
+        "LM_Remote_Service02_7045.evtx": { "event_ids": [7045], "techniques": ["T1543.003"], "cves": ["CVE-2022-21999"] }
+      }
+    },
+    "attack-samples": {
+      "expected_verdict_band": "INDETERMINATE",
+      "evtx": {
+        "DE_1102_security_log_cleared.evtx": { "event_ids": [1102], "techniques": ["T1070.001"], "cves": [] },
+        "CA_4624_4625_LogonType2_LogonProc_chrome.evtx": { "event_ids": [4624, 4625], "techniques": ["T1078"], "cves": [] },
+        "LM_Remote_Service02_7045.evtx": { "event_ids": [7045], "techniques": ["T1543.003"], "cves": ["CVE-2022-21999"] },
+        "LM_WMI_4624_4688_TargetHost.evtx": { "event_ids": [4624, 4688], "techniques": ["T1047"], "cves": [] }
+      }
+    },
+    "bench-evtx-2026-07-03": {
+      "expected_verdict_band": "INDETERMINATE",
+      "evtx": {
+        "4765_sidhistory_add_t1178.evtx": { "event_ids": [4765, 4766], "techniques": ["T1178"], "cves": [] },
+        "4794_DSRM_password_change_t1098.evtx": { "event_ids": [4794], "techniques": ["T1098"], "cves": [] },
+        "CA_DCSync_4662.evtx": { "event_ids": [4662], "techniques": ["T1003.006"], "cves": [] },
+        "Invoke_TokenDuplication_UAC_Bypass4624.evtx": { "event_ids": [4624], "techniques": ["T1134"], "cves": [] },
+        "LM_5145_Remote_FileCopy.evtx": { "event_ids": [5145], "techniques": ["T1021.002"], "cves": [] },
+        "Network_Service_Guest_added_to_admins_4732.evtx": { "event_ids": [4732], "techniques": ["T1098"], "cves": [] }
+      }
+    }
+  }
+}

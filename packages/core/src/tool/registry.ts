@@ -116,7 +116,12 @@ const registryLayer = Layer.effect(
           settle: (input) => {
             const registration = registrations.get(input.call.name)
             if (registration) return settleWith(input, registration.identity)
-            return Effect.succeed({ result: { type: "error", value: `Unknown tool: ${input.call.name}` } })
+            const available = Array.from(registrations.keys()).slice(0, 48)
+            const value =
+              available.length > 0
+                ? `Unknown tool: ${input.call.name}. Available tools (${available.length}): ${available.join(", ")}`
+                : `Unknown tool: ${input.call.name}`
+            return Effect.succeed({ result: { type: "error", value } })
           },
         }
       }),

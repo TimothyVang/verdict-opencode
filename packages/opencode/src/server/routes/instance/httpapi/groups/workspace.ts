@@ -53,6 +53,7 @@ export const WorkspaceApi = HttpApi.make("workspace")
         HttpApiEndpoint.get("adapters", WorkspacePaths.adapters, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(WorkspaceAdapterEntry), "Workspace adapters"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.adapter.list",
@@ -63,6 +64,7 @@ export const WorkspaceApi = HttpApi.make("workspace")
         HttpApiEndpoint.get("list", WorkspacePaths.list, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Workspace.Info), "Workspaces"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.list",
@@ -85,6 +87,7 @@ export const WorkspaceApi = HttpApi.make("workspace")
         HttpApiEndpoint.post("syncList", WorkspacePaths.syncList, {
           query: WorkspaceRoutingQuery,
           success: described(HttpApiSchema.NoContent, "Workspace list synced"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.syncList",
@@ -95,6 +98,7 @@ export const WorkspaceApi = HttpApi.make("workspace")
         HttpApiEndpoint.get("status", WorkspacePaths.status, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Workspace.ConnectionStatus), "Workspace status"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "experimental.workspace.status",

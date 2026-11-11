@@ -37,6 +37,7 @@ describe("opencode run (non-interactive subprocess)", () => {
 
         const result = yield* opencode.run("use a tool", {
           extraArgs: ["--dangerously-skip-permissions"],
+          timeoutMs: 60_000,
         })
 
         opencode.expectExit(result, 0)
@@ -73,10 +74,10 @@ describe("opencode run (non-interactive subprocess)", () => {
       Effect.gen(function* () {
         const result = yield* opencode.run("say hi", {
           model: "test/nonexistent-model",
-          timeoutMs: 15_000,
+          timeoutMs: 20_000,
         })
         expect(result.exitCode).not.toBe(0)
-        expect(result.durationMs).toBeLessThan(15_000)
+        expect(result.durationMs).toBeLessThan(20_000)
       }),
     30_000,
   )

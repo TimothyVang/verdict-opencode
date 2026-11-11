@@ -1,0 +1,2427 @@
+{
+  "agent": "find-evil-auto MVP",
+  "analysis_limitations": [
+    "Evidence inventory recorded 1 unsupported artifact(s) as custody-only limitations.",
+    "hayabusa did not complete (tool error); raw output is in the run audit log. Resolve the tool's prerequisites and re-run."
+  ],
+  "attack_coverage": {
+    "blind_spot_count": 7,
+    "covered_target_count": 5,
+    "finding_target_count": 0,
+    "observed_techniques": [
+      "T1047",
+      "T1543.003"
+    ],
+    "summary": "5/12 ATT&CK targets covered by typed-tool output; 0 target(s) produced finding-level evidence; 7 target(s) remain blind spots",
+    "targets": [
+      {
+        "analyst_value": "Cross-view process enumeration for DKOM/rootkit signals.",
+        "artifact_classes": [
+          "memory"
+        ],
+        "artifact_classes_observed": [],
+        "finding_confidence": null,
+        "gap": "missing or untouched artifact classes: memory",
+        "status": "blind_spot",
+        "tactic": "Defense Evasion",
+        "technique_id": "T1014",
+        "technique_name": "Rootkit",
+        "tools_expected": [
+          "vol_pslist",
+          "vol_psscan",
+          "vol_psxview"
+        ],
+        "tools_observed": []
+      },
+      {
+        "analyst_value": "Suspicious VADs, injected code, and payload triage.",
+        "artifact_classes": [
+          "memory"
+        ],
+        "artifact_classes_observed": [],
+        "finding_confidence": null,
+        "gap": "missing or untouched artifact classes: memory",
+        "status": "blind_spot",
+        "tactic": "Defense Evasion / Privilege Escalation",
+        "technique_id": "T1055",
+        "technique_name": "Process Injection",
+        "tools_expected": [
+          "vol_malfind",
+          "yara_scan"
+        ],
+        "tools_observed": []
+      },
+      {
+        "analyst_value": "PowerShell process, script-block, and execution artifacts.",
+        "artifact_classes": [
+          "evtx",
+          "disk/filesystem"
+        ],
+        "artifact_classes_observed": [
+          "evtx"
+        ],
+        "finding_confidence": null,
+        "gap": "limited coverage \u2014 not proof of absence",
+        "status": "covered_no_finding",
+        "tactic": "Execution",
+        "technique_id": "T1059.001",
+        "technique_name": "PowerShell",
+        "tools_expected": [
+          "evtx_query",
+          "hayabusa_scan",
+          "prefetch_parse"
+        ],
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      },
+      {
+        "analyst_value": "Logon events and remote-session evidence.",
+        "artifact_classes": [
+          "evtx"
+        ],
+        "artifact_classes_observed": [
+          "evtx"
+        ],
+        "finding_confidence": null,
+        "gap": "limited coverage \u2014 not proof of absence",
+        "status": "covered_no_finding",
+        "tactic": "Lateral Movement",
+        "technique_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol",
+        "tools_expected": [
+          "evtx_query",
+          "hayabusa_scan"
+        ],
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      },
+      {
+        "analyst_value": "Account logon, privilege use, and local-account artifacts.",
+        "artifact_classes": [
+          "evtx",
+          "disk/filesystem"
+        ],
+        "artifact_classes_observed": [
+          "evtx"
+        ],
+        "finding_confidence": null,
+        "gap": "limited coverage \u2014 not proof of absence",
+        "status": "covered_no_finding",
+        "tactic": "Defense Evasion / Persistence / Privilege Escalation",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts",
+        "tools_expected": [
+          "evtx_query",
+          "hayabusa_scan",
+          "registry_query"
+        ],
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      },
+      {
+        "analyst_value": "LSASS access, dumping utilities, and credential-theft traces.",
+        "artifact_classes": [
+          "memory",
+          "evtx",
+          "disk/filesystem"
+        ],
+        "artifact_classes_observed": [
+          "evtx"
+        ],
+        "finding_confidence": null,
+        "gap": "limited coverage \u2014 not proof of absence",
+        "status": "covered_no_finding",
+        "tactic": "Credential Access",
+        "technique_id": "T1003",
+        "technique_name": "OS Credential Dumping",
+        "tools_expected": [
+          "vol_malfind",
+          "evtx_query",
+          "hayabusa_scan",
+          "yara_scan"
+        ],
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      },
+      {
+        "analyst_value": "New files, download traces, and transfer telemetry.",
+        "artifact_classes": [
+          "disk/filesystem",
+          "network"
+        ],
+        "artifact_classes_observed": [],
+        "finding_confidence": null,
+        "gap": "missing or untouched artifact classes: disk/filesystem, network",
+        "status": "blind_spot",
+        "tactic": "Command and Control",
+        "technique_id": "T1105",
+        "technique_name": "Ingress Tool Transfer",
+        "tools_expected": [
+          "mft_timeline",
+          "usnjrnl_query",
+          "yara_scan",
+          "vel_collect",
+          "pcap_triage",
+          "zeek_summary"
+        ],
+        "tools_observed": []
+      },
+      {
+        "analyst_value": "HTTP/S hosts, external web connections, and process-to-web telemetry for cautious C2 triage.",
+        "artifact_classes": [
+          "network"
+        ],
+        "artifact_classes_observed": [],
+        "finding_confidence": null,
+        "gap": "missing or untouched artifact classes: network",
+        "status": "blind_spot",
+        "tactic": "Command and Control",
+        "technique_id": "T1071.001",
+        "technique_name": "Web Protocols",
+        "tools_expected": [
+          "pcap_triage",
+          "zeek_summary",
+          "sysmon_network_query"
+        ],
+        "tools_observed": []
+      },
+      {
+        "analyst_value": "DNS queries and resolver conversations for suspicious-domain triage.",
+        "artifact_classes": [
+          "network"
+        ],
+        "artifact_classes_observed": [],
+        "finding_confidence": null,
+        "gap": "missing or untouched artifact classes: network",
+        "status": "blind_spot",
+        "tactic": "Command and Control",
+        "technique_id": "T1071.004",
+        "technique_name": "DNS",
+        "tools_expected": [
+          "pcap_triage",
+          "zeek_summary"
+        ],
+        "tools_observed": []
+      },
+      {
+        "analyst_value": "Network telemetry needed to prove or reject exfiltration.",
+        "artifact_classes": [
+          "network"
+        ],
+        "artifact_classes_observed": [],
+        "finding_confidence": null,
+        "gap": "missing or untouched artifact classes: network",
+        "status": "blind_spot",
+        "tactic": "Exfiltration",
+        "technique_id": "T1041",
+        "technique_name": "Exfiltration Over C2 Channel",
+        "tools_expected": [
+          "pcap_triage",
+          "zeek_summary",
+          "sysmon_network_query",
+          "vel_collect"
+        ],
+        "tools_observed": []
+      },
+      {
+        "analyst_value": "Autorun persistence and execution corroboration.",
+        "artifact_classes": [
+          "disk/filesystem"
+        ],
+        "artifact_classes_observed": [],
+        "finding_confidence": null,
+        "gap": "missing or untouched artifact classes: disk/filesystem",
+        "status": "blind_spot",
+        "tactic": "Persistence / Privilege Escalation",
+        "technique_id": "T1547.001",
+        "technique_name": "Registry Run Keys / Startup Folder",
+        "tools_expected": [
+          "registry_query",
+          "prefetch_parse",
+          "mft_timeline"
+        ],
+        "tools_observed": []
+      },
+      {
+        "analyst_value": "Scheduled-task creation, TaskCache, and task XML evidence.",
+        "artifact_classes": [
+          "evtx",
+          "disk/filesystem"
+        ],
+        "artifact_classes_observed": [
+          "evtx"
+        ],
+        "finding_confidence": null,
+        "gap": "limited coverage \u2014 not proof of absence",
+        "status": "covered_no_finding",
+        "tactic": "Execution / Persistence / Privilege Escalation",
+        "technique_id": "T1053.005",
+        "technique_name": "Scheduled Task",
+        "tools_expected": [
+          "evtx_query",
+          "hayabusa_scan",
+          "registry_query"
+        ],
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      }
+    ]
+  },
+  "attack_story": {
+    "assessment": "A service named 'spoolfool' with a shell image is the public signature of the SpoolFool exploit (CVE-2022-21999), which abuses the Print Spooler's SpoolDirectory handling to drop a DLL and execute as SYSTEM. The service is the persistence / payload-delivery artifact, not the exploit primitive.",
+    "attack_chain": [
+      {
+        "action": "a Windows service installation",
+        "actor": "",
+        "analyst_note": "A service named 'spoolfool' with a shell image is the public signature of the SpoolFool exploit (CVE-2022-21999), which abuses the Print Spooler's SpoolDirectory handling to drop a DLL and execute as SYSTEM. The service is the persistence / payload-delivery artifact, not the exploit primitive.",
+        "artifact_classes": [
+          "evtx"
+        ],
+        "confidence": "HYPOTHESIS",
+        "cves": [
+          "CVE-2022-21999"
+        ],
+        "finding_id": "f-B-evtx-service-install",
+        "host": "WIN-77LTAPHIQ1R.example.corp",
+        "hunt": "Security 7045 where ServiceName like 'spool%' and ImagePath has cmd.exe/powershell; System 7000/7009 spoolsv failures; new DLLs under \\spool\\drivers",
+        "mitre_technique": "T1543.003",
+        "named_technique": "SpoolFool \u2014 Windows Print Spooler privilege escalation",
+        "next_pivot": "Pull the Spooler driver directory (C:\\Windows\\System32\\spool\\drivers), the spoolsv.exe child-process tree, and System EIDs 7045/7000/7009 around this time; hash the service image and check Amcache/Prefetch for execution.",
+        "order": 1,
+        "phase": "Persistence",
+        "phase_index": 2,
+        "source_event_ids": [
+          "timeline-0001"
+        ],
+        "summary": "hypothesis: EVTX EID 7045 records installation of service 'spoolfool' (image cmd.exe) (record 1); service installation is a durable persistence and lateral-movement mechanism \u2014 the image path looks suspicious; corroborate the binary and origin before response.",
+        "timestamp_utc": "2019-03-03T09:20:28.621489Z",
+        "title": "hypothesis: EVTX EID 7045 records installation of service 'spoolfool' (image cmd.exe) (record 1); service inst",
+        "tool_call_id": "tc-001",
+        "why_it_matters": "A service named 'spoolfool' with a shell image is the public signature of the SpoolFool exploit (CVE-2022-21999), which abuses the Print Spooler's SpoolDirectory handling to drop a DLL and execute as SYSTEM. The service is the persistence / payload-delivery artifact, not the exploit primitive."
+      },
+      {
+        "action": "remote WMI process execution",
+        "actor": "EXAMPLE\\WIN-77LTAPHIQ1R$",
+        "analyst_note": "A process whose parent is WmiPrvSE.exe is the signature of remote WMI execution (Win32_Process.Create, e.g. `wmic /node` or Invoke-WmiMethod) \u2014 a largely fileless, hands-on-keyboard lateral-movement technique.",
+        "artifact_classes": [
+          "evtx"
+        ],
+        "confidence": "HYPOTHESIS",
+        "cves": [],
+        "finding_id": "f-B-evtx-wmi-exec",
+        "host": "WIN-77LTAPHIQ1R.example.corp",
+        "hunt": "Security 4688 where ParentProcessName endswith WmiPrvSE.exe and NewProcessName not in {wmiprvse.exe, scrcons.exe}; WMI-Activity/Operational 5857-5861",
+        "mitre_technique": "T1047",
+        "named_technique": "Remote WMI process execution (T1047)",
+        "next_pivot": "Pull Microsoft-Windows-WMI-Activity/Operational for the originating host and user, the 4624 Type 3 logon immediately preceding this 4688, and the child command line; check the source host for the initiating wmic/powershell.",
+        "order": 2,
+        "phase": "Lateral Movement",
+        "phase_index": 7,
+        "source_event_ids": [
+          "timeline-0008"
+        ],
+        "summary": "hypothesis: EVTX Security EID 4688 shows calc.exe with WmiPrvSE.exe as its parent process, under EXAMPLE\\WIN-77LTAPHIQ1R$ (record 6) \u2014 consistent with remote WMI activity (a lateral-movement pattern); corroborate the source host and process bytes.",
+        "timestamp_utc": "2019-03-18T22:15:49.676748Z",
+        "title": "hypothesis: EVTX Security EID 4688 shows calc.exe with WmiPrvSE.exe as its parent process, under EXAMPLE\\WIN-7",
+        "tool_call_id": "tc-002",
+        "why_it_matters": "A process whose parent is WmiPrvSE.exe is the signature of remote WMI execution (Win32_Process.Create, e.g. `wmic /node` or Invoke-WmiMethod) \u2014 a largely fileless, hands-on-keyboard lateral-movement technique."
+      }
+    ],
+    "business_impact": "",
+    "certainty": "Low \u2014 a single-source lead; a direction to pursue, not a conclusion.",
+    "confidence_posture": {
+      "CONFIRMED": 0,
+      "HYPOTHESIS": 2,
+      "INFERRED": 0
+    },
+    "customer_releasable": false,
+    "customer_release_candidate": false,
+    "customer_summary": "The supplied evidence shows a Windows service installation on WIN-77LTAPHIQ1R.example.corp at 2019-03-03T09:20:28Z.",
+    "evidence_scope": {
+      "artifact_classes_touched": [
+        "evtx"
+      ],
+      "coverage_summary": "1/5 artifact classes touched; 1/5 directly available from supplied evidence",
+      "evidence_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement",
+      "evidence_type": "directory"
+    },
+    "expert_decision": "pending",
+    "expert_miss_summary": {
+      "by_type": {},
+      "items": [],
+      "ledger_path": "expert_misses.jsonl",
+      "summary": "Expert misses captured this case: 0 (uncaptured edits are a QA defect; see EXPERT.md Replacement metric).",
+      "total": 0
+    },
+    "headline": "Triage lead: a Windows service installation on WIN-77LTAPHIQ1R.example.corp \u2014 persistence / execution.",
+    "how_they_got_in": "Remote WMI process execution (T1047) on WIN-77LTAPHIQ1R.example.corp",
+    "ready_for_customer_pdf": false,
+    "ready_for_expert_signoff": true,
+    "recommended_next_decisions": [
+      "Use read-only SIFT disk workflow to extract Prefetch, Registry, MFT, USN Journal, and YARA targets before parsing them with typed tools.",
+      "Acquire DNS, proxy, firewall, NetFlow, or PCAP telemetry to test C2 and exfiltration hypotheses.",
+      "Close ATT&CK blind spots before making closure decisions."
+    ],
+    "root_cause": "",
+    "signoff_question": "Would I send this report to a company without rewriting it?",
+    "verdict": "INDETERMINATE",
+    "verdict_meaning": "Use the verdict as a triage priority, then read each Finding confidence and citation before acting.",
+    "version": 1,
+    "what_we_can_say": [
+      "The run produced only triage-level leads; read each cited tool call in the findings detail before acting."
+    ],
+    "what_we_cannot_say": [
+      "Who operated the activity \u2014 this report does not assert attribution; naming an account reflects a record field, not the human behind it.",
+      "Whether the wider environment is affected \u2014 this run examined the supplied evidence only.",
+      "Undetermined: Whether the installed service is malicious. Reason: the install record points to a binary it does not analyze. To resolve: extract and analyze the service binary (signature, prevalence) and check for a paired remote logon (PsExec/lateral movement).",
+      "Undetermined: execution and persistence cannot be confirmed without disk artifacts. To resolve: parse a triage collection \u2014 $MFT, $UsnJrnl, Amcache, ShimCache, Prefetch, and Registry run keys/services/tasks.",
+      "Undetermined: command-and-control and exfiltration cannot be assessed without network data. To resolve: collect DNS, proxy, firewall, or NetFlow logs, or a PCAP.",
+      "Undetermined: injected code and hidden processes cannot be examined without a memory image. To resolve: capture RAM and run the volatility process and injection plugins."
+    ]
+  },
+  "attck_practitioner_coverage": {
+    "data_source_coverage": [
+      {
+        "data_source_id": "DS0003",
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "covered_no_finding",
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      },
+      {
+        "data_source_id": "DS0009",
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "covered_no_finding",
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      },
+      {
+        "data_source_id": "DS0017",
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "covered_no_finding",
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      },
+      {
+        "data_source_id": "DS0019",
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "covered_no_finding",
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      },
+      {
+        "data_source_id": "DS0028",
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "covered_no_finding",
+        "tools_observed": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      }
+    ],
+    "lanes": {
+      "endpoint_host": {
+        "artifact_classes_seen": [],
+        "attck_data_sources_seen": [],
+        "attck_techniques_observed": [
+          "T1543.003"
+        ],
+        "coverage_gaps": [
+          "missing or untouched artifact classes: disk/filesystem"
+        ],
+        "findings_linked": [
+          "f-B-evtx-service-install"
+        ],
+        "label": "Host & Endpoint Forensics",
+        "next_actions": [
+          "Supply lane-relevant evidence and rerun typed tools."
+        ],
+        "status": "not_covered",
+        "tools_run": []
+      },
+      "live_response": {
+        "artifact_classes_seen": [],
+        "attck_data_sources_seen": [],
+        "attck_techniques_observed": [],
+        "coverage_gaps": [
+          "missing or untouched artifact classes: velociraptor"
+        ],
+        "findings_linked": [],
+        "label": "Endpoint Telemetry & Live Response",
+        "next_actions": [
+          "Supply lane-relevant evidence and rerun typed tools."
+        ],
+        "status": "not_covered",
+        "tools_run": []
+      },
+      "malware": {
+        "artifact_classes_seen": [],
+        "attck_data_sources_seen": [],
+        "attck_techniques_observed": [],
+        "coverage_gaps": [
+          "missing or untouched artifact classes: disk/filesystem, memory"
+        ],
+        "findings_linked": [],
+        "label": "Malware Analysis & Triage",
+        "next_actions": [
+          "Supply lane-relevant evidence and rerun typed tools."
+        ],
+        "status": "not_covered",
+        "tools_run": []
+      },
+      "memory": {
+        "artifact_classes_seen": [],
+        "attck_data_sources_seen": [],
+        "attck_techniques_observed": [],
+        "coverage_gaps": [
+          "missing or untouched artifact classes: memory"
+        ],
+        "findings_linked": [],
+        "label": "Memory Forensics",
+        "next_actions": [
+          "Supply lane-relevant evidence and rerun typed tools."
+        ],
+        "status": "not_covered",
+        "tools_run": []
+      },
+      "network": {
+        "artifact_classes_seen": [],
+        "attck_data_sources_seen": [],
+        "attck_techniques_observed": [],
+        "coverage_gaps": [
+          "missing or untouched artifact classes: network",
+          "no PCAP, Zeek, proxy, DNS, firewall, or NetFlow telemetry supplied"
+        ],
+        "findings_linked": [],
+        "label": "Network Forensics",
+        "next_actions": [
+          "Supply lane-relevant evidence and rerun typed tools."
+        ],
+        "status": "not_covered",
+        "tools_run": []
+      },
+      "windows_event": {
+        "artifact_classes_seen": [
+          "evtx"
+        ],
+        "attck_data_sources_seen": [
+          "DS0003",
+          "DS0009",
+          "DS0017",
+          "DS0019",
+          "DS0028"
+        ],
+        "attck_techniques_observed": [],
+        "coverage_gaps": [],
+        "findings_linked": [
+          "f-B-evtx-service-install",
+          "f-B-evtx-wmi-exec"
+        ],
+        "label": "Windows Event & Account Analysis",
+        "next_actions": [
+          "Corroborate lane-specific leads with another artifact class before upgrading confidence."
+        ],
+        "status": "automated",
+        "tools_run": [
+          "evtx_query",
+          "hayabusa_scan"
+        ]
+      }
+    },
+    "overclaim_guardrails_applied": [
+      "covered_no_finding is limited coverage, not a clean/cleared claim",
+      "Domain coverage describes triage/orchestration across the typed tools that ran, not certified-analyst judgment",
+      "visual exhibits do not create findings or upgrade confidence",
+      "execution claims still require at least two artifact classes"
+    ],
+    "research_basis": [
+      "MITRE ATT&CK data sources and techniques",
+      "SANS FOR508/FOR572/FOR610 public course themes",
+      "Zeek, Velociraptor, Sigma/Hayabusa, YARA, capa public docs",
+      "DFIR Report, Red Canary, Elastic Security Labs practitioner reporting patterns",
+      "Reddit DFIR/computerforensics/blueteamsec prioritization signals"
+    ],
+    "source_citation_ids": [
+      "CITE-MITRE-ATTACK-DATASOURCES",
+      "CITE-MITRE-T1003-001",
+      "CITE-MITRE-T1014",
+      "CITE-NIST-800-61R2",
+      "CITE-VOLATILITY3",
+      "CITE-ZEEK-LOGS"
+    ],
+    "technique_coverage": [
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-T1014",
+          "CITE-VOLATILITY3"
+        ],
+        "status": "blind_spot",
+        "technique_id": "T1014",
+        "technique_name": "Rootkit"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES",
+          "CITE-VOLATILITY3"
+        ],
+        "status": "blind_spot",
+        "technique_id": "T1055",
+        "technique_name": "Process Injection"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "covered_no_finding",
+        "technique_id": "T1059.001",
+        "technique_name": "PowerShell"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "covered_no_finding",
+        "technique_id": "T1021.001",
+        "technique_name": "Remote Desktop Protocol"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "covered_no_finding",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-T1003-001"
+        ],
+        "status": "covered_no_finding",
+        "technique_id": "T1003",
+        "technique_name": "OS Credential Dumping"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "blind_spot",
+        "technique_id": "T1105",
+        "technique_name": "Ingress Tool Transfer"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES",
+          "CITE-ZEEK-LOGS"
+        ],
+        "status": "blind_spot",
+        "technique_id": "T1071.001",
+        "technique_name": "Web Protocols"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES",
+          "CITE-ZEEK-LOGS"
+        ],
+        "status": "blind_spot",
+        "technique_id": "T1071.004",
+        "technique_name": "DNS"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES",
+          "CITE-ZEEK-LOGS"
+        ],
+        "status": "blind_spot",
+        "technique_id": "T1041",
+        "technique_name": "Exfiltration Over C2 Channel"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "blind_spot",
+        "technique_id": "T1547.001",
+        "technique_name": "Registry Run Keys / Startup Folder"
+      },
+      {
+        "linked_findings": [],
+        "source_citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "status": "covered_no_finding",
+        "technique_id": "T1053.005",
+        "technique_name": "Scheduled Task"
+      }
+    ],
+    "version": 1
+  },
+  "case_completeness": {
+    "available_classes": 1,
+    "checks": [
+      {
+        "artifact_class": "memory",
+        "available": false,
+        "confidence_impact": "not a memory image; no live-process evidence",
+        "tools": [],
+        "touched": false
+      },
+      {
+        "artifact_class": "evtx",
+        "available": true,
+        "confidence_impact": "Windows event evidence available",
+        "tools": [
+          "evtx_query",
+          "hayabusa_scan"
+        ],
+        "touched": true
+      },
+      {
+        "artifact_class": "disk/filesystem",
+        "available": false,
+        "confidence_impact": "no disk image supplied; execution/persistence corroboration is limited",
+        "tools": [],
+        "touched": false
+      },
+      {
+        "artifact_class": "network",
+        "available": false,
+        "confidence_impact": "no PCAP, Zeek, firewall, DNS, or proxy logs supplied",
+        "tools": [],
+        "touched": false
+      },
+      {
+        "artifact_class": "velociraptor",
+        "available": false,
+        "confidence_impact": "no Velociraptor collection supplied",
+        "tools": [],
+        "touched": false
+      }
+    ],
+    "evidence_type": "directory",
+    "inventory_summary": {
+      "class_counts": {
+        "evtx": 2,
+        "unknown": 1
+      },
+      "disk_artifact_counts": {
+        "amcache": 0,
+        "browser_db": 0,
+        "browser_history": 0,
+        "evtx": 2,
+        "ie_history": 0,
+        "jumplist": 0,
+        "legacy_evt": 0,
+        "lnk": 0,
+        "mft": 0,
+        "prefetch": 0,
+        "recyclebin": 0,
+        "reg_txlog": 0,
+        "registry": 0,
+        "scheduled_task": 0,
+        "srum": 0,
+        "thumbnail": 0,
+        "usnjrnl": 0,
+        "yara_target": 0
+      },
+      "duplicate_names": [],
+      "entry_count": 3,
+      "evidence_type_counts": {
+        "evtx": 2,
+        "unknown": 1
+      },
+      "extracted_disk_count": 0,
+      "limit": 500,
+      "raw_disk_count": 0,
+      "rejected_count": 0,
+      "truncated": false,
+      "unsupported_samples": [
+        "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/README.md"
+      ],
+      "yara_target_count": 0
+    },
+    "summary": "1/5 artifact classes touched; 1/5 directly available from supplied evidence",
+    "touched_classes": 1
+  },
+  "case_id": "dir-b0e04f2ae2d63232",
+  "coverage_manifest": {
+    "analysis_limitations": [
+      "Evidence inventory recorded 1 unsupported artifact(s) as custody-only limitations.",
+      "hayabusa did not complete (tool error); raw output is in the run audit log. Resolve the tool's prerequisites and re-run."
+    ],
+    "artifact_classes": [
+      {
+        "artifact_class": "disk/filesystem",
+        "attempted": false,
+        "available": false,
+        "confidence_impact": "no disk image supplied; execution/persistence corroboration is limited",
+        "failed": false,
+        "not_supplied": true,
+        "parse_errors": 0,
+        "parsed": false,
+        "records_seen": 0,
+        "rows_returned": 0,
+        "status": "not_supplied",
+        "tool_call_ids": [],
+        "tools_attempted": [],
+        "tools_failed": [],
+        "unsupported": false
+      },
+      {
+        "artifact_class": "evtx",
+        "attempted": true,
+        "available": true,
+        "confidence_impact": "Windows event evidence available",
+        "failed": true,
+        "not_supplied": false,
+        "parse_errors": 0,
+        "parsed": true,
+        "records_seen": 11,
+        "rows_returned": 11,
+        "status": "partial",
+        "tool_call_ids": [
+          "tc-001",
+          "tc-002",
+          "tc-003"
+        ],
+        "tools_attempted": [
+          "evtx_query",
+          "evtx_query",
+          "hayabusa_scan"
+        ],
+        "tools_failed": [
+          "hayabusa_scan"
+        ],
+        "unsupported": false
+      },
+      {
+        "artifact_class": "memory",
+        "attempted": false,
+        "available": false,
+        "confidence_impact": "not a memory image; no live-process evidence",
+        "failed": false,
+        "not_supplied": true,
+        "parse_errors": 0,
+        "parsed": false,
+        "records_seen": 0,
+        "rows_returned": 0,
+        "status": "not_supplied",
+        "tool_call_ids": [],
+        "tools_attempted": [],
+        "tools_failed": [],
+        "unsupported": false
+      },
+      {
+        "artifact_class": "network",
+        "attempted": false,
+        "available": false,
+        "confidence_impact": "no PCAP, Zeek, firewall, DNS, or proxy logs supplied",
+        "failed": false,
+        "not_supplied": true,
+        "parse_errors": 0,
+        "parsed": false,
+        "records_seen": 0,
+        "rows_returned": 0,
+        "status": "not_supplied",
+        "tool_call_ids": [],
+        "tools_attempted": [],
+        "tools_failed": [],
+        "unsupported": false
+      },
+      {
+        "artifact_class": "velociraptor",
+        "attempted": false,
+        "available": false,
+        "confidence_impact": "no Velociraptor collection supplied",
+        "failed": false,
+        "not_supplied": true,
+        "parse_errors": 0,
+        "parsed": false,
+        "records_seen": 0,
+        "rows_returned": 0,
+        "status": "not_supplied",
+        "tool_call_ids": [],
+        "tools_attempted": [],
+        "tools_failed": [],
+        "unsupported": false
+      },
+      {
+        "artifact_class": "unsupported",
+        "attempted": false,
+        "available": true,
+        "confidence_impact": "Unsupported artifact(s) were recorded as custody or scope limitations; VERDICT cannot reason over evidence no typed parser extracted.",
+        "failed": false,
+        "not_supplied": false,
+        "parse_errors": 0,
+        "parsed": false,
+        "records_seen": 1,
+        "rows_returned": 0,
+        "sample_paths": [
+          "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/README.md"
+        ],
+        "status": "unsupported",
+        "tool_call_ids": [],
+        "tools_attempted": [],
+        "tools_failed": [],
+        "unsupported": true
+      }
+    ],
+    "attack_coverage_summary": "5/12 ATT&CK targets covered by typed-tool output; 0 target(s) produced finding-level evidence; 7 target(s) remain blind spots",
+    "case_id": "dir-b0e04f2ae2d63232",
+    "evidence_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement",
+    "evidence_type": "directory",
+    "summary": {
+      "analysis_limitation_count": 2,
+      "artifact_classes_recorded": 6,
+      "attack_blind_spot_count": 7,
+      "attempted": 1,
+      "failed": 1,
+      "not_supplied": 4,
+      "parsed": 1,
+      "status_counts": {
+        "not_supplied": 4,
+        "partial": 1,
+        "unsupported": 1
+      },
+      "unsupported": 1,
+      "unsupported_sample_count": 1
+    },
+    "truth_boundary": "If no parser/tool extracts an artifact class, VERDICT cannot reason over it. This manifest records that boundary explicitly.",
+    "version": 1
+  },
+  "cryptographic_attestation": {
+    "manifest_finalized_after_verdict": true,
+    "manifest_path": "run.manifest.json",
+    "packet_attestation": {
+      "customer_releasable": false,
+      "customer_release_candidate": false,
+      "final_finding_ids": [
+        "f-B-evtx-service-install",
+        "f-B-evtx-wmi-exec"
+      ],
+      "packet_state": "EXPERT_REVIEW_DRAFT",
+      "release_gate_sha256": "ebd8ed18a72baa423531054f845ad0038219fcef5b940632d9ba4dfb371b944c",
+      "report_qa_sha256": "86e3764a62ceb9ad3f4bbf5efe13cab996bd23837b130da779d9a196827ee0d6",
+      "verdict_packet_sha256": "756c47d71027fd96bdfeda83ab2627a7bc607c44363b08ce139efd6b300ed236"
+    }
+  },
+  "disk_artifact_summary": {
+    "analysis_constraints": [
+      "Raw disk case_open is custody-only; only mounted or extracted artifacts support disk-content observations.",
+      "Prefetch run counts are execution leads and still require a second artifact class before execution claims are upgraded.",
+      "YARA matches on disk files are triage leads unless corroborated with file-system, process, registry, event-log, or network context.",
+      "Every promoted Finding must cite a tool_call_id and pass verifier replay before judge consumption."
+    ],
+    "artifact_counts": {
+      "amcache": 0,
+      "browser_db": 0,
+      "browser_history": 0,
+      "evtx": 2,
+      "ie_history": 0,
+      "jumplist": 0,
+      "legacy_evt": 0,
+      "lnk": 0,
+      "mft": 0,
+      "prefetch": 0,
+      "recyclebin": 0,
+      "reg_txlog": 0,
+      "registry": 0,
+      "scheduled_task": 0,
+      "srum": 0,
+      "thumbnail": 0,
+      "usnjrnl": 0,
+      "yara_target": 0
+    },
+    "next_actions": [
+      {
+        "action": "Pair extracted EVTX records with disk timeline artifacts before asserting process execution or persistence chains.",
+        "based_on": [
+          "evtx_query",
+          "hayabusa_scan"
+        ],
+        "priority": "P2",
+        "why": "Event logs add behavior context and can satisfy cross-artifact corroboration when linked to disk observations."
+      }
+    ],
+    "scope": "extracted_disk_artifacts_only",
+    "timeline_event_count": 11,
+    "tool_summaries": {
+      "evtx_query": [
+        {
+          "artifact_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/LM_Remote_Service02_7045.evtx",
+          "parse_errors": 0,
+          "records_seen": 3,
+          "row_count": 3,
+          "suspicious_event_count": 1,
+          "tool_call_id": "tc-001",
+          "top_event_ids": [
+            {
+              "count": 3,
+              "event_id": "7045"
+            }
+          ]
+        },
+        {
+          "artifact_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/LM_WMI_4624_4688_TargetHost.evtx",
+          "parse_errors": 0,
+          "records_seen": 8,
+          "row_count": 8,
+          "suspicious_event_count": 1,
+          "tool_call_id": "tc-002",
+          "top_event_ids": [
+            {
+              "count": 6,
+              "event_id": "4624"
+            },
+            {
+              "count": 2,
+              "event_id": "4688"
+            }
+          ]
+        }
+      ]
+    },
+    "verdict_contribution": "timeline_context",
+    "version": 1
+  },
+  "entity_index": {
+    "accounts": [
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 4,
+        "first_seen": "2019-03-18T22:15:36.036376Z",
+        "last_seen": "2019-03-18T22:16:19.989944Z",
+        "linked_finding_ids": [
+          "f-B-evtx-wmi-exec"
+        ],
+        "tool_call_ids": [
+          "tc-002"
+        ],
+        "value": "EXAMPLE\\WIN-77LTAPHIQ1R$"
+      },
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 3,
+        "first_seen": "2019-03-18T22:15:49.583102Z",
+        "last_seen": "2019-03-18T22:15:49.614293Z",
+        "linked_finding_ids": [],
+        "tool_call_ids": [
+          "tc-002"
+        ],
+        "value": "EXAMPLE\\Administrator"
+      },
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 1,
+        "first_seen": "2019-03-18T22:15:49.692401Z",
+        "last_seen": "2019-03-18T22:15:49.692401Z",
+        "linked_finding_ids": [],
+        "tool_call_ids": [
+          "tc-002"
+        ],
+        "value": "EXAMPLE\\user01"
+      }
+    ],
+    "destination_ips": [],
+    "entity_count": 13,
+    "hosts": [
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 11,
+        "first_seen": "2019-03-03T09:20:28.621489Z",
+        "last_seen": "2019-03-19T00:41:29.008933Z",
+        "linked_finding_ids": [
+          "f-B-evtx-service-install",
+          "f-B-evtx-wmi-exec"
+        ],
+        "tool_call_ids": [
+          "tc-001",
+          "tc-002"
+        ],
+        "value": "WIN-77LTAPHIQ1R.example.corp"
+      }
+    ],
+    "processes": [
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 1,
+        "first_seen": "2019-03-18T22:15:49.676748Z",
+        "last_seen": "2019-03-18T22:15:49.676748Z",
+        "linked_finding_ids": [
+          "f-B-evtx-wmi-exec"
+        ],
+        "tool_call_ids": [
+          "tc-002"
+        ],
+        "value": "C:\\Windows\\System32\\calc.exe"
+      },
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 1,
+        "first_seen": "2019-03-18T22:15:49.645889Z",
+        "last_seen": "2019-03-18T22:15:49.645889Z",
+        "linked_finding_ids": [],
+        "tool_call_ids": [
+          "tc-002"
+        ],
+        "value": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe"
+      }
+    ],
+    "services": [
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 1,
+        "first_seen": "2019-03-19T00:41:29.008933Z",
+        "last_seen": "2019-03-19T00:41:29.008933Z",
+        "linked_finding_ids": [],
+        "tool_call_ids": [
+          "tc-001"
+        ],
+        "value": "remotesvc"
+      },
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 1,
+        "first_seen": "2019-03-03T09:20:28.621489Z",
+        "last_seen": "2019-03-03T09:20:28.621489Z",
+        "linked_finding_ids": [
+          "f-B-evtx-service-install"
+        ],
+        "tool_call_ids": [
+          "tc-001"
+        ],
+        "value": "spoolfool"
+      },
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 1,
+        "first_seen": "2019-03-03T09:24:24.699653Z",
+        "last_seen": "2019-03-03T09:24:24.699653Z",
+        "linked_finding_ids": [],
+        "tool_call_ids": [
+          "tc-001"
+        ],
+        "value": "spoolsv"
+      }
+    ],
+    "source_ips": [
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 4,
+        "first_seen": "2019-03-18T22:15:49.583102Z",
+        "last_seen": "2019-03-18T22:15:49.692401Z",
+        "linked_finding_ids": [],
+        "tool_call_ids": [
+          "tc-002"
+        ],
+        "value": "10.0.2.17"
+      },
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 1,
+        "first_seen": "2019-03-18T22:16:19.989944Z",
+        "last_seen": "2019-03-18T22:16:19.989944Z",
+        "linked_finding_ids": [],
+        "tool_call_ids": [
+          "tc-002"
+        ],
+        "value": "::1"
+      },
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 1,
+        "first_seen": "2019-03-18T22:15:36.036376Z",
+        "last_seen": "2019-03-18T22:15:36.036376Z",
+        "linked_finding_ids": [],
+        "tool_call_ids": [
+          "tc-002"
+        ],
+        "value": "fe80::79bf:8ee2:433c:2567"
+      }
+    ],
+    "version": 1,
+    "workstations": [
+      {
+        "artifact_classes": [
+          "evtx"
+        ],
+        "event_count": 1,
+        "first_seen": "2019-03-18T22:15:49.614293Z",
+        "last_seen": "2019-03-18T22:15:49.614293Z",
+        "linked_finding_ids": [],
+        "tool_call_ids": [
+          "tc-002"
+        ],
+        "value": "PC01"
+      }
+    ]
+  },
+  "event_narratives": [
+    {
+      "confidence": "HYPOTHESIS",
+      "entities": {
+        "host": "WIN-77LTAPHIQ1R.example.corp",
+        "service_name": "spoolfool",
+        "service_path": "cmd.exe"
+      },
+      "linked_finding_ids": [
+        "f-B-evtx-service-install"
+      ],
+      "summary": "Service installed: service 'spoolfool'",
+      "text": "At 2019-03-03T09:20:28.621489Z UTC, Service installed: service 'spoolfool' (tool call tc-001, HYPOTHESIS).",
+      "timestamp_utc": "2019-03-03T09:20:28.621489Z",
+      "tool_call_id": "tc-001"
+    },
+    {
+      "confidence": "HYPOTHESIS",
+      "entities": {
+        "account": "WIN-77LTAPHIQ1R$",
+        "domain": "EXAMPLE",
+        "host": "WIN-77LTAPHIQ1R.example.corp",
+        "pid": "0x424",
+        "process": "C:\\Windows\\System32\\calc.exe"
+      },
+      "linked_finding_ids": [
+        "f-B-evtx-wmi-exec"
+      ],
+      "summary": "Process created: account EXAMPLE\\WIN-77LTAPHIQ1R$, process C:\\Windows\\System32\\calc.exe",
+      "text": "At 2019-03-18T22:15:49.676748Z UTC, Process created: account EXAMPLE\\WIN-77LTAPHIQ1R$, process C:\\Windows\\System32\\calc.exe (tool call tc-002, HYPOTHESIS).",
+      "timestamp_utc": "2019-03-18T22:15:49.676748Z",
+      "tool_call_id": "tc-002"
+    }
+  ],
+  "evidence_inventory": {
+    "canonical_root": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement",
+    "entries": [
+      {
+        "artifact_class": "evtx",
+        "canonical_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/LM_Remote_Service02_7045.evtx",
+        "child_evidence_id": "ev-f2d6d91a932ce256",
+        "custody_status": "custody_registered",
+        "evidence_type": "evtx",
+        "parser_tool": "evtx_query",
+        "path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/LM_Remote_Service02_7045.evtx",
+        "sha256": "af758eb492b6d5ab6665f7e4c44b31490f57be78c37dc0a8b1da714bb0d3d458",
+        "size_bytes": 69632,
+        "symlink_status": "not_symlink"
+      },
+      {
+        "artifact_class": "evtx",
+        "canonical_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/LM_WMI_4624_4688_TargetHost.evtx",
+        "child_evidence_id": "ev-27640d39062a810d",
+        "custody_status": "custody_registered",
+        "evidence_type": "evtx",
+        "parser_tool": "evtx_query",
+        "path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/LM_WMI_4624_4688_TargetHost.evtx",
+        "sha256": "3ff3fcdb55c08ec0eaa39b25c1e02a205314f367bcedc662586bd063185ca41d",
+        "size_bytes": 69632,
+        "symlink_status": "not_symlink"
+      },
+      {
+        "artifact_class": "unknown",
+        "canonical_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/README.md",
+        "child_evidence_id": "ev-8f547abb55a3fb2e",
+        "custody_status": "custody_registered",
+        "evidence_type": "unknown",
+        "parser_tool": null,
+        "path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/README.md",
+        "sha256": "645bed93df61fa0c332a673bc052b9baad9267dd38bdbb7e6344368fd79a0650",
+        "size_bytes": 1559,
+        "symlink_status": "not_symlink"
+      }
+    ],
+    "inventory_sha256": "b0e04f2ae2d6323243d8b5c854a13c8e63dab55826f8378a5c091468fc0d7f2e",
+    "limit": 500,
+    "parent_case_id": "dir-b0e04f2ae2d63232",
+    "root_is_directory": true,
+    "root_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement",
+    "summary": {
+      "class_counts": {
+        "evtx": 2,
+        "unknown": 1
+      },
+      "disk_artifact_counts": {
+        "amcache": 0,
+        "browser_db": 0,
+        "browser_history": 0,
+        "evtx": 2,
+        "ie_history": 0,
+        "jumplist": 0,
+        "legacy_evt": 0,
+        "lnk": 0,
+        "mft": 0,
+        "prefetch": 0,
+        "recyclebin": 0,
+        "reg_txlog": 0,
+        "registry": 0,
+        "scheduled_task": 0,
+        "srum": 0,
+        "thumbnail": 0,
+        "usnjrnl": 0,
+        "yara_target": 0
+      },
+      "duplicate_names": [],
+      "entry_count": 3,
+      "evidence_type_counts": {
+        "evtx": 2,
+        "unknown": 1
+      },
+      "extracted_disk_count": 0,
+      "limit": 500,
+      "raw_disk_count": 0,
+      "rejected_count": 0,
+      "truncated": false,
+      "unsupported_samples": [
+        "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/README.md"
+      ],
+      "yara_target_count": 0
+    },
+    "truncated": false
+  },
+  "evidence_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement",
+  "evidence_type": "directory",
+  "evtx_summary": {
+    "channels": [
+      "Security",
+      "System"
+    ],
+    "distinct_event_ids": 3,
+    "parse_errors": 0,
+    "reason": "high-signal event semantics produced finding-level evidence",
+    "records_seen": 11,
+    "row_count": 11,
+    "suspicious_event_count": 2,
+    "top_event_ids": [
+      {
+        "count": 6,
+        "event_id": "4624"
+      },
+      {
+        "count": 3,
+        "event_id": "7045"
+      },
+      {
+        "count": 2,
+        "event_id": "4688"
+      }
+    ],
+    "verdict_contribution": "finding"
+  },
+  "expert_doctrine": {
+    "claim_rules": [
+      {
+        "category": "citation",
+        "fail_behavior": "block_customer_pdf",
+        "id": "finding_tool_call_required",
+        "requirement": "Every Finding must cite a non-empty tool_call_id that exists in the case tool-call list.",
+        "severity": "blocker"
+      },
+      {
+        "category": "reproducibility",
+        "fail_behavior": "block_customer_pdf",
+        "id": "verify_finding_replay_embedded",
+        "requirement": "Customer-ready reports must embed verifier replay evidence for each Finding and every replay must match the audited tool output.",
+        "severity": "blocker"
+      },
+      {
+        "category": "reproducibility",
+        "fail_behavior": "block_customer_pdf",
+        "id": "verify_finding_replay_failures",
+        "requirement": "A verifier rejection or replay failure must force INDETERMINATE or blocked customer release, never NO_EVIL.",
+        "severity": "blocker"
+      },
+      {
+        "category": "execution",
+        "fail_behavior": "downgrade_or_block",
+        "id": "execution_requires_two_current_artifact_classes",
+        "requirement": "Execution claims require at least two current-case artifact classes. Prefetch is preferred; Amcache, ShimCache, memory-only process evidence, YARA, Hayabusa, and malfind are not standalone execution proof.",
+        "severity": "blocker"
+      },
+      {
+        "category": "exfiltration",
+        "fail_behavior": "downgrade_or_block",
+        "id": "exfiltration_requires_staging_and_movement",
+        "requirement": "Exfiltration claims require staging or collection evidence plus network, tool, or data-movement evidence.",
+        "severity": "blocker"
+      },
+      {
+        "category": "verdict",
+        "fail_behavior": "require_scope_caveat",
+        "id": "no_evil_is_scoped",
+        "requirement": "NO_EVIL means no reportable Finding in the artifact classes examined. It must not imply environment-wide assurance.",
+        "severity": "warning"
+      },
+      {
+        "category": "coverage",
+        "fail_behavior": "force_indeterminate_or_expert_review",
+        "id": "disk_auto_mode_custody_only",
+        "requirement": "Raw disk auto mode is custody-only unless mounted or extracted artifacts are supplied and parsed.",
+        "severity": "blocker"
+      },
+      {
+        "category": "reporting",
+        "fail_behavior": "require_report_caveat",
+        "id": "visuals_do_not_upgrade_confidence",
+        "requirement": "Charts, evidence cards, screenshots, and PDF exhibits support cited tool output but never create Findings or raise confidence.",
+        "severity": "warning"
+      },
+      {
+        "category": "language",
+        "fail_behavior": "block_customer_pdf",
+        "id": "no_attribution",
+        "requirement": "Never assert actor attribution from supplied host artifacts.",
+        "severity": "blocker"
+      },
+      {
+        "category": "language",
+        "fail_behavior": "block_customer_pdf",
+        "id": "no_forbidden_unqualified_language",
+        "requirement": "Customer-visible Finding and report text must not use unqualified language that overstates scope, attribution, execution, compromise, or malware status.",
+        "severity": "blocker"
+      }
+    ],
+    "forbidden_unqualified_terms": [
+      "clean",
+      "cleared",
+      "disproven",
+      "absent",
+      "no compromise",
+      "absence of compromise",
+      "absence of the technique",
+      "attributed to",
+      "malware operator",
+      "the attacker",
+      "is malware",
+      "breach confirmed",
+      "customer-ready",
+      "customer ready"
+    ],
+    "operating_model": "The agent prepares an evidence-bound signoff packet; the human expert remains final authority for customer release.",
+    "source_files": [
+      "agent-config/SOUL.md",
+      "agent-config/MEMORY.md",
+      "agent-config/PLAYBOOK.md",
+      "agent-config/EXPERT.md"
+    ],
+    "supported_domains": {
+      "autonomous_today": [
+        "windows_memory",
+        "windows_evtx",
+        "disk_custody_registration",
+        "timeline_normalization",
+        "evidence_backed_pdf_reporting",
+        "miss-feedback-loop"
+      ],
+      "escalation_only": [
+        "legal_notification",
+        "attribution",
+        "unsupported_cloud_or_saas",
+        "mobile_forensics",
+        "ot_ics_forensics",
+        "failed_report_qa"
+      ],
+      "partial_today": [
+        "disk_content_analysis_without_mount",
+        "exfiltration_without_network_telemetry",
+        "malware_capability_without_reverse_engineering",
+        "identity_compromise_from_single_log_source"
+      ]
+    },
+    "version": 1
+  },
+  "expert_miss_summary": {
+    "by_type": {},
+    "items": [],
+    "ledger_path": "expert_misses.jsonl",
+    "summary": "Expert misses captured this case: 0 (uncaptured edits are a QA defect; see EXPERT.md Replacement metric).",
+    "total": 0
+  },
+  "expert_signoff": {
+    "customer_releasable": false,
+    "customer_release_candidate": false,
+    "expert_decision": "pending",
+    "expert_signoff_required": true,
+    "ready_for_customer_pdf": false,
+    "signer": "ed25519",
+    "signoff_question": "Would I send this report to a company without rewriting it?",
+    "status": "PENDING_EXPERT_REVIEW"
+  },
+  "expert_signoff_packet": {
+    "customer_releasable": false,
+    "decision": "pending",
+    "expert_miss_summary": {
+      "by_type": {},
+      "items": [],
+      "ledger_path": "expert_misses.jsonl",
+      "summary": "Expert misses captured this case: 0 (uncaptured edits are a QA defect; see EXPERT.md Replacement metric).",
+      "total": 0
+    },
+    "feedback_items": [],
+    "referenced_hashes": {
+      "release_gate_sha256": "ebd8ed18a72baa423531054f845ad0038219fcef5b940632d9ba4dfb371b944c",
+      "report_qa_sha256": "86e3764a62ceb9ad3f4bbf5efe13cab996bd23837b130da779d9a196827ee0d6",
+      "run_manifest_sha256": null,
+      "verdict_packet_sha256": "756c47d71027fd96bdfeda83ab2627a7bc607c44363b08ce139efd6b300ed236"
+    },
+    "referenced_paths": {
+      "run_manifest": "run.manifest.json",
+      "verdict": "verdict.json"
+    },
+    "release_blockers": [
+      "ATT&CK coverage includes blind spots that require expert awareness.",
+      "Analysis limitations must remain visible before customer release.",
+      "customer release requires an effective manifest_finalize signer=sigstore (identity + transparency log); ed25519 proves integrity offline but not identity, and stub signatures are dev/offline only",
+      "explicit human expert approval is required before customer release",
+      "finalized manifest signature metadata must be present before customer release",
+      "manifest_verify must pass before customer release"
+    ],
+    "release_conditions": {
+      "expert_approved": false,
+      "machine_qa_passed": false,
+      "sigstore_signer": false
+    },
+    "required_before_customer_release": true,
+    "review_time_minutes": null,
+    "reviewed_at": null,
+    "reviewer_identity": null,
+    "signoff_question": "Would I send this report to a company without rewriting it?",
+    "status": "PENDING_EXPERT_REVIEW",
+    "version": 1
+  },
+  "finalized_at": null,
+  "findings": [
+    {
+      "analyst_note": "A service named 'spoolfool' with a shell image is the public signature of the SpoolFool exploit (CVE-2022-21999), which abuses the Print Spooler's SpoolDirectory handling to drop a DLL and execute as SYSTEM. The service is the persistence / payload-delivery artifact, not the exploit primitive.",
+      "artifact_offset": null,
+      "artifact_path": "LM_Remote_Service02_7045.evtx",
+      "asserted_values": [],
+      "case_id": "dir-b0e04f2ae2d63232",
+      "confidence": "HYPOTHESIS",
+      "counter_hypothesis": null,
+      "cves": [
+        "CVE-2022-21999"
+      ],
+      "derived_from": null,
+      "description": "hypothesis: EVTX EID 7045 records installation of service 'spoolfool' (image cmd.exe) (record 1); service installation is a durable persistence and lateral-movement mechanism \u2014 the image path looks suspicious; corroborate the binary and origin before response.",
+      "event_id": "0175b0b5-81a2-4c22-b5aa-6099c9af7e9b",
+      "event_type": "Finding",
+      "expectation": null,
+      "finding_id": "f-B-evtx-service-install",
+      "host": "WIN-77LTAPHIQ1R.example.corp",
+      "hunt": "Security 7045 where ServiceName like 'spool%' and ImagePath has cmd.exe/powershell; System 7000/7009 spoolsv failures; new DLLs under \\spool\\drivers",
+      "mitre_technique": "T1543.003",
+      "named_technique": "SpoolFool \u2014 Windows Print Spooler privilege escalation",
+      "next_pivot": "Pull the Spooler driver directory (C:\\Windows\\System32\\spool\\drivers), the spoolsv.exe child-process tree, and System EIDs 7045/7000/7009 around this time; hash the service image and check Amcache/Prefetch for execution.",
+      "pool_origin": "B",
+      "prior_observations": [],
+      "replay_actual_sha256": "c02ce481d2f1a84b7657d60c0e7c308f17209bbd2c6f2bdfe473345353942df5",
+      "replay_artifact": {
+        "actual_sha256": "c02ce481d2f1a84b7657d60c0e7c308f17209bbd2c6f2bdfe473345353942df5",
+        "arguments_sha256": "fa4b860c5dfaed7f37071087976fdb4cd066c045f6413864256113192ddedcf3",
+        "drift_class": "exact_match",
+        "drift_reason": "replay output_sha256 matches audit log",
+        "entailment": null,
+        "error": null,
+        "expected_sha256": "c02ce481d2f1a84b7657d60c0e7c308f17209bbd2c6f2bdfe473345353942df5",
+        "matched": true,
+        "replay_tool_call_id": "357790f9-44aa-4cf0-b19f-eb7bd2218a38",
+        "schema_version": "findevil.replay.v1",
+        "tool_call_id": "tc-001",
+        "tool_name": "evtx_query",
+        "wall_clock_ms": 3
+      },
+      "replay_error": null,
+      "replay_expected_sha256": "c02ce481d2f1a84b7657d60c0e7c308f17209bbd2c6f2bdfe473345353942df5",
+      "replay_matched": true,
+      "replay_record_sha256": "970eacc9aac53c6305fc92ae3bf7a3b2ae78bf5e715075d8d0e0b0f321e6efff",
+      "replay_tool_name": "evtx_query",
+      "tool_call_id": "tc-001",
+      "ts": "2026-07-10T16:48:03Z",
+      "verifier_action": "approved"
+    },
+    {
+      "analyst_note": "A process whose parent is WmiPrvSE.exe is the signature of remote WMI execution (Win32_Process.Create, e.g. `wmic /node` or Invoke-WmiMethod) \u2014 a largely fileless, hands-on-keyboard lateral-movement technique.",
+      "artifact_offset": null,
+      "artifact_path": "LM_WMI_4624_4688_TargetHost.evtx",
+      "asserted_values": [],
+      "case_id": "dir-b0e04f2ae2d63232",
+      "confidence": "HYPOTHESIS",
+      "counter_hypothesis": null,
+      "derived_from": null,
+      "description": "hypothesis: EVTX Security EID 4688 shows calc.exe with WmiPrvSE.exe as its parent process, under EXAMPLE\\WIN-77LTAPHIQ1R$ (record 6) \u2014 consistent with remote WMI activity (a lateral-movement pattern); corroborate the source host and process bytes.",
+      "event_id": "24185148-098f-43e0-aecb-3cf307894c49",
+      "event_type": "Finding",
+      "expectation": null,
+      "finding_id": "f-B-evtx-wmi-exec",
+      "host": "WIN-77LTAPHIQ1R.example.corp",
+      "hunt": "Security 4688 where ParentProcessName endswith WmiPrvSE.exe and NewProcessName not in {wmiprvse.exe, scrcons.exe}; WMI-Activity/Operational 5857-5861",
+      "mitre_technique": "T1047",
+      "named_technique": "Remote WMI process execution (T1047)",
+      "next_pivot": "Pull Microsoft-Windows-WMI-Activity/Operational for the originating host and user, the 4624 Type 3 logon immediately preceding this 4688, and the child command line; check the source host for the initiating wmic/powershell.",
+      "pool_origin": "B",
+      "prior_observations": [],
+      "replay_actual_sha256": "51f6fa751e99986b9648b45b942fe534386cbe2853aa33fdcb422c207814dd7a",
+      "replay_artifact": {
+        "actual_sha256": "51f6fa751e99986b9648b45b942fe534386cbe2853aa33fdcb422c207814dd7a",
+        "arguments_sha256": "b7cc2cd6622038f1ff32448ada7d7e505f832fae64e20dd4bd8fa70a46ead378",
+        "drift_class": "exact_match",
+        "drift_reason": "replay output_sha256 matches audit log",
+        "entailment": null,
+        "error": null,
+        "expected_sha256": "51f6fa751e99986b9648b45b942fe534386cbe2853aa33fdcb422c207814dd7a",
+        "matched": true,
+        "replay_tool_call_id": "92bba86d-c3b5-442c-97cc-51dee2071c6b",
+        "schema_version": "findevil.replay.v1",
+        "tool_call_id": "tc-002",
+        "tool_name": "evtx_query",
+        "wall_clock_ms": 3
+      },
+      "replay_error": null,
+      "replay_expected_sha256": "51f6fa751e99986b9648b45b942fe534386cbe2853aa33fdcb422c207814dd7a",
+      "replay_matched": true,
+      "replay_record_sha256": "0688d040cb0288c0ee2ca7a27362d2bf726f2b1d45c7c12b61ca04443f71242d",
+      "replay_tool_name": "evtx_query",
+      "tool_call_id": "tc-002",
+      "ts": "2026-07-10T16:48:03Z",
+      "verifier_action": "approved"
+    }
+  ],
+  "findings_summary": {
+    "by_confidence": {
+      "CONFIRMED": 0,
+      "HYPOTHESIS": 2,
+      "INFERRED": 0
+    },
+    "contradictions_surfaced": 0,
+    "correlation_outcomes": [
+      {
+        "action": "downgraded",
+        "finding_id": "f-B-evtx-service-install",
+        "reason": "execution claim from a single artifact class without prefetch/EDR corroboration"
+      },
+      {
+        "action": "kept",
+        "finding_id": "f-B-evtx-wmi-exec",
+        "reason": "non-execution claim"
+      }
+    ],
+    "soul_md_downgraded": 1,
+    "soul_md_kept": 1,
+    "total_merged": 2,
+    "verdict_revisions": 0,
+    "verifier_redispatches": {},
+    "verifier_rejected_leads": 0
+  },
+  "heartbeat": {
+    "consecutive_failures": 0,
+    "escalated": false,
+    "terminated_partial": false
+  },
+  "host_groups": [
+    {
+      "by_confidence": {
+        "CONFIRMED": 0,
+        "HYPOTHESIS": 2,
+        "INFERRED": 0
+      },
+      "event_count": 11,
+      "evidence_sources": [
+        "LM_Remote_Service02_7045.evtx",
+        "LM_WMI_4624_4688_TargetHost.evtx"
+      ],
+      "finding_count": 2,
+      "finding_ids": [
+        "f-B-evtx-service-install",
+        "f-B-evtx-wmi-exec"
+      ],
+      "first_seen": "2019-03-03T09:20:28.621489Z",
+      "host": "WIN-77LTAPHIQ1R.example.corp",
+      "last_seen": "2019-03-19T00:41:29.008933Z",
+      "top_confidence": "HYPOTHESIS"
+    }
+  ],
+  "indicators": {
+    "accounts": [
+      "EXAMPLE\\Administrator",
+      "EXAMPLE\\WIN-77LTAPHIQ1R$",
+      "EXAMPLE\\user01"
+    ],
+    "domains": [],
+    "file_paths": [
+      "calc.exe",
+      "cmd.exe"
+    ],
+    "hashes": [],
+    "hosts": [
+      "PC01",
+      "WIN-77LTAPHIQ1R.example.corp"
+    ],
+    "indicator_count": 15,
+    "ip_addresses": [
+      "10.0.2.17",
+      "::1",
+      "fe80::79bf:8ee2:433c:2567"
+    ],
+    "note": "Observed artifacts pulled from the timeline and findings; validate or corroborate before detection deployment or blocking.",
+    "processes": [
+      "C:\\Windows\\System32\\calc.exe",
+      "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe"
+    ],
+    "services": [
+      "remotesvc",
+      "spoolfool",
+      "spoolsv"
+    ],
+    "urls": [],
+    "version": 1
+  },
+  "malware_triage": null,
+  "next_actions": [
+    {
+      "action": "Use read-only SIFT disk workflow to extract Prefetch, Registry, MFT, USN Journal, and YARA targets before parsing them with typed tools.",
+      "based_on": [
+        "disk_gap"
+      ],
+      "expected_evidence": "ewfmount read-only mount, Sleuth Kit file extraction, Prefetch, Amcache/ShimCache, Run keys, services, scheduled tasks, MFT/USN entries",
+      "priority": "P2",
+      "why": "Execution and persistence claims need disk-backed corroboration; memory-only observations are not enough for final execution claims."
+    },
+    {
+      "action": "Acquire DNS, proxy, firewall, NetFlow, or PCAP telemetry to test C2 and exfiltration hypotheses.",
+      "based_on": [
+        "network_gap"
+      ],
+      "expected_evidence": "DNS queries, proxy URLs, firewall sessions, PCAP, Velociraptor network collection",
+      "priority": "P3",
+      "why": "Network telemetry was not supplied or parsed in this run, so exfiltration and command-and-control coverage remains a blind spot."
+    },
+    {
+      "action": "Close ATT&CK blind spots before making closure decisions.",
+      "based_on": [
+        "T1014",
+        "T1055",
+        "T1105",
+        "T1071.001",
+        "T1071.004"
+      ],
+      "expected_evidence": "Additional evidence classes mapped in attack_coverage.targets[].artifact_classes",
+      "priority": "P3",
+      "why": "The coverage matrix identifies target techniques with no supporting artifact class in this run."
+    },
+    {
+      "action": "Pivot from the first and last normalized timeline events into adjacent artifact classes.",
+      "based_on": [
+        "timeline"
+      ],
+      "expected_evidence": "timeline.csv plus adjacent EVTX, Prefetch, MFT, and network events",
+      "priority": "P4",
+      "why": "Temporal clustering often exposes execution chains that a single artifact class cannot prove alone."
+    },
+    {
+      "action": "Verify run.manifest.json with manifest_verify before sharing or archiving results.",
+      "based_on": [
+        "custody"
+      ],
+      "expected_evidence": "run.manifest.json, audit.jsonl, verdict.json, timeline.csv",
+      "priority": "P4",
+      "why": "The audit chain and Merkle root are the reproducibility boundary for judge and analyst review."
+    }
+  ],
+  "normalized_timeline": {
+    "events": [
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [
+          "T1543.003"
+        ],
+        "citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "confidence": "HYPOTHESIS",
+        "entities": {
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "service_name": "spoolfool",
+          "service_path": "cmd.exe"
+        },
+        "event_id": "timeline-0001",
+        "limitations": [],
+        "linked_finding_ids": [
+          "f-B-evtx-service-install"
+        ],
+        "significance": "finding_support",
+        "source_record_ref": "evtx_query:record_id=1;event_id=7045",
+        "summary": "Service installed: service 'spoolfool'",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-03T09:20:28.621489Z",
+        "tool_call_id": "tc-001"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [],
+        "citation_ids": [],
+        "confidence": "CONFIRMED",
+        "entities": {
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "service_name": "spoolsv",
+          "service_path": "cmd.exe"
+        },
+        "event_id": "timeline-0002",
+        "limitations": [],
+        "linked_finding_ids": [],
+        "significance": "context",
+        "source_record_ref": "evtx_query:record_id=2;event_id=7045",
+        "summary": "Service installed: service 'spoolsv'",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-03T09:24:24.699653Z",
+        "tool_call_id": "tc-001"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [],
+        "citation_ids": [],
+        "confidence": "CONFIRMED",
+        "entities": {
+          "account": "WIN-77LTAPHIQ1R$",
+          "domain": "EXAMPLE",
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "logon_type": "3",
+          "logon_type_label": "Network",
+          "pid": "0x0",
+          "source_ip": "fe80::79bf:8ee2:433c:2567",
+          "source_port": "55585"
+        },
+        "event_id": "timeline-0003",
+        "limitations": [],
+        "linked_finding_ids": [],
+        "significance": "context",
+        "source_record_ref": "evtx_query:record_id=1;event_id=4624;pid=0x0",
+        "summary": "Successful logon: account EXAMPLE\\WIN-77LTAPHIQ1R$, logon Network, from fe80::79bf:8ee2:433c:2567",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-18T22:15:36.036376Z",
+        "tool_call_id": "tc-002"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [],
+        "citation_ids": [],
+        "confidence": "CONFIRMED",
+        "entities": {
+          "account": "Administrator",
+          "domain": "EXAMPLE",
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "logon_type": "3",
+          "logon_type_label": "Network",
+          "pid": "0x0",
+          "source_ip": "10.0.2.17",
+          "source_port": "49244"
+        },
+        "event_id": "timeline-0004",
+        "limitations": [],
+        "linked_finding_ids": [],
+        "significance": "context",
+        "source_record_ref": "evtx_query:record_id=2;event_id=4624;pid=0x0",
+        "summary": "Successful logon: account EXAMPLE\\Administrator, logon Network, from 10.0.2.17",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-18T22:15:49.583102Z",
+        "tool_call_id": "tc-002"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [],
+        "citation_ids": [],
+        "confidence": "CONFIRMED",
+        "entities": {
+          "account": "Administrator",
+          "domain": "EXAMPLE",
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "logon_type": "3",
+          "logon_type_label": "Network",
+          "pid": "0x0",
+          "source_ip": "10.0.2.17",
+          "source_port": "49249"
+        },
+        "event_id": "timeline-0005",
+        "limitations": [],
+        "linked_finding_ids": [],
+        "significance": "context",
+        "source_record_ref": "evtx_query:record_id=3;event_id=4624;pid=0x0",
+        "summary": "Successful logon: account EXAMPLE\\Administrator, logon Network, from 10.0.2.17",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-18T22:15:49.614293Z",
+        "tool_call_id": "tc-002"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [],
+        "citation_ids": [],
+        "confidence": "CONFIRMED",
+        "entities": {
+          "account": "Administrator",
+          "domain": "EXAMPLE",
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "logon_type": "3",
+          "logon_type_label": "Network",
+          "pid": "0x0",
+          "source_ip": "10.0.2.17",
+          "source_port": "49249",
+          "workstation": "PC01"
+        },
+        "event_id": "timeline-0006",
+        "limitations": [],
+        "linked_finding_ids": [],
+        "significance": "context",
+        "source_record_ref": "evtx_query:record_id=4;event_id=4624;pid=0x0",
+        "summary": "Successful logon: account EXAMPLE\\Administrator, logon Network, from 10.0.2.17, workstation PC01",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-18T22:15:49.614293Z",
+        "tool_call_id": "tc-002"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [],
+        "citation_ids": [],
+        "confidence": "CONFIRMED",
+        "entities": {
+          "account": "WIN-77LTAPHIQ1R$",
+          "domain": "EXAMPLE",
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "pid": "0xae8",
+          "process": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe"
+        },
+        "event_id": "timeline-0007",
+        "limitations": [],
+        "linked_finding_ids": [],
+        "significance": "context",
+        "source_record_ref": "evtx_query:record_id=5;event_id=4688;pid=0xae8",
+        "summary": "Process created: account EXAMPLE\\WIN-77LTAPHIQ1R$, process C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-18T22:15:49.645889Z",
+        "tool_call_id": "tc-002"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [
+          "T1047"
+        ],
+        "citation_ids": [
+          "CITE-MITRE-ATTACK-DATASOURCES"
+        ],
+        "confidence": "HYPOTHESIS",
+        "entities": {
+          "account": "WIN-77LTAPHIQ1R$",
+          "domain": "EXAMPLE",
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "pid": "0x424",
+          "process": "C:\\Windows\\System32\\calc.exe"
+        },
+        "event_id": "timeline-0008",
+        "limitations": [],
+        "linked_finding_ids": [
+          "f-B-evtx-wmi-exec"
+        ],
+        "significance": "finding_support",
+        "source_record_ref": "evtx_query:record_id=6;event_id=4688;pid=0x424",
+        "summary": "Process created: account EXAMPLE\\WIN-77LTAPHIQ1R$, process C:\\Windows\\System32\\calc.exe",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-18T22:15:49.676748Z",
+        "tool_call_id": "tc-002"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [],
+        "citation_ids": [],
+        "confidence": "CONFIRMED",
+        "entities": {
+          "account": "user01",
+          "domain": "EXAMPLE",
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "logon_type": "3",
+          "logon_type_label": "Network",
+          "pid": "0x0",
+          "source_ip": "10.0.2.17",
+          "source_port": "49249"
+        },
+        "event_id": "timeline-0009",
+        "limitations": [],
+        "linked_finding_ids": [],
+        "significance": "context",
+        "source_record_ref": "evtx_query:record_id=7;event_id=4624;pid=0x0",
+        "summary": "Successful logon: account EXAMPLE\\user01, logon Network, from 10.0.2.17",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-18T22:15:49.692401Z",
+        "tool_call_id": "tc-002"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [],
+        "citation_ids": [],
+        "confidence": "CONFIRMED",
+        "entities": {
+          "account": "WIN-77LTAPHIQ1R$",
+          "domain": "EXAMPLE",
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "logon_type": "3",
+          "logon_type_label": "Network",
+          "pid": "0x0",
+          "source_ip": "::1",
+          "source_port": "55589"
+        },
+        "event_id": "timeline-0010",
+        "limitations": [],
+        "linked_finding_ids": [],
+        "significance": "context",
+        "source_record_ref": "evtx_query:record_id=8;event_id=4624;pid=0x0",
+        "summary": "Successful logon: account EXAMPLE\\WIN-77LTAPHIQ1R$, logon Network, from ::1",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-18T22:16:19.989944Z",
+        "tool_call_id": "tc-002"
+      },
+      {
+        "artifact_class": "evtx",
+        "attck_techniques": [],
+        "citation_ids": [],
+        "confidence": "CONFIRMED",
+        "entities": {
+          "host": "WIN-77LTAPHIQ1R.example.corp",
+          "service_name": "remotesvc",
+          "service_path": "calc.exe"
+        },
+        "event_id": "timeline-0011",
+        "limitations": [],
+        "linked_finding_ids": [],
+        "significance": "context",
+        "source_record_ref": "evtx_query:record_id=3;event_id=7045",
+        "summary": "Service installed: service 'remotesvc'",
+        "timestamp_source": "Event.System.TimeCreated",
+        "timestamp_utc": "2019-03-19T00:41:29.008933Z",
+        "tool_call_id": "tc-001"
+      }
+    ],
+    "limitations": [],
+    "source_coverage": [
+      {
+        "artifact_class": "evtx",
+        "event_count": 11
+      }
+    ],
+    "version": 1
+  },
+  "rejected_finding_leads": [],
+  "release_gate": {
+    "customer_releasable": false,
+    "customer_release_candidate": false,
+    "expert_approved": false,
+    "expert_decision": "pending",
+    "expert_signoff_required": true,
+    "failed_checks": [],
+    "machine_qa_passed": false,
+    "manifest_signature_present": false,
+    "manifest_verified": false,
+    "packet_state": "EXPERT_REVIEW_DRAFT",
+    "qa_status": "WARN",
+    "ready_for_customer_pdf": false,
+    "release_blockers": [
+      "ATT&CK coverage includes blind spots that require expert awareness.",
+      "Analysis limitations must remain visible before customer release.",
+      "customer release requires an effective manifest_finalize signer=sigstore (identity + transparency log); ed25519 proves integrity offline but not identity, and stub signatures are dev/offline only",
+      "explicit human expert approval is required before customer release",
+      "finalized manifest signature metadata must be present before customer release",
+      "manifest_verify must pass before customer release"
+    ],
+    "report_render_allowed": true,
+    "signer": "ed25519",
+    "signer_customer_release_ok": false,
+    "signer_effective": "ed25519",
+    "warning_checks": [
+      "limitations_visible",
+      "attack_coverage_blind_spots"
+    ]
+  },
+  "report_evidence_cards": [
+    {
+      "card_id": "evidence-card-001",
+      "caveats": [
+        "Visual exhibit supports the cited finding but does not replace parsed tool output.",
+        "HYPOTHESIS confidence requires additional artifact corroboration."
+      ],
+      "citation_ids": [
+        "CITE-MITRE-ATTACK-DATASOURCES"
+      ],
+      "confidence": "HYPOTHESIS",
+      "linked_finding_ids": [
+        "f-B-evtx-service-install"
+      ],
+      "snippet": "hypothesis: EVTX EID 7045 records installation of service 'spoolfool' (image cmd.exe) (record 1); service installation is a durable persistence and lateral-movement mechanism \u2014 the image path looks suspicious; corroborate the binary and ori",
+      "source_record_refs": [
+        "evtx_query:record_id=1;event_id=7045",
+        "evtx_query:record_id=2;event_id=7045",
+        "evtx_query:record_id=3;event_id=7045"
+      ],
+      "title": "hypothesis: EVTX EID 7045 records installation of service 'spoolfool' (image cmd.exe) (rec",
+      "tool_call_id": "tc-001",
+      "visual_asset": null,
+      "why_suspicious": "This observable is relevant because finding `f-B-evtx-service-install` is backed by parsed tool output `tc-001` and should be interpreted with the cited artifact and source caveats."
+    },
+    {
+      "card_id": "evidence-card-002",
+      "caveats": [
+        "Visual exhibit supports the cited finding but does not replace parsed tool output.",
+        "HYPOTHESIS confidence requires additional artifact corroboration."
+      ],
+      "citation_ids": [
+        "CITE-MITRE-ATTACK-DATASOURCES"
+      ],
+      "confidence": "HYPOTHESIS",
+      "linked_finding_ids": [
+        "f-B-evtx-wmi-exec"
+      ],
+      "snippet": "hypothesis: EVTX Security EID 4688 shows calc.exe with WmiPrvSE.exe as its parent process, under EXAMPLE\\WIN-77LTAPHIQ1R$ (record 6) \u2014 consistent with remote WMI activity (a lateral-movement pattern); corroborate the source host and process",
+      "source_record_refs": [
+        "evtx_query:record_id=1;event_id=4624;pid=0x0",
+        "evtx_query:record_id=2;event_id=4624;pid=0x0",
+        "evtx_query:record_id=3;event_id=4624;pid=0x0"
+      ],
+      "title": "hypothesis: EVTX Security EID 4688 shows calc.exe with WmiPrvSE.exe as its parent process,",
+      "tool_call_id": "tc-002",
+      "visual_asset": null,
+      "why_suspicious": "This observable is relevant because finding `f-B-evtx-wmi-exec` is backed by parsed tool output `tc-002` and should be interpreted with the cited artifact and source caveats."
+    }
+  ],
+  "report_qa": {
+    "checks": [
+      {
+        "check_id": "finding_tool_call_required",
+        "evidence": [
+          "tc-001",
+          "tc-002",
+          "tc-003"
+        ],
+        "status": "PASS",
+        "summary": "All 2 Finding(s) cite current-case tool calls."
+      },
+      {
+        "check_id": "execution_requires_two_current_artifact_classes",
+        "evidence": [
+          "evtx"
+        ],
+        "status": "PASS",
+        "summary": "No unsupported execution wording detected, or current-case corroboration is broad enough for expert review."
+      },
+      {
+        "check_id": "exfiltration_requires_staging_and_movement",
+        "evidence": [],
+        "status": "PASS",
+        "summary": "No unsupported exfiltration claim detected."
+      },
+      {
+        "check_id": "disk_auto_mode_custody_only",
+        "evidence": [],
+        "status": "PASS",
+        "summary": "No custody-only disk overclaim detected."
+      },
+      {
+        "check_id": "no_evil_is_scoped",
+        "evidence": [],
+        "status": "PASS",
+        "summary": "Verdict wording remains scoped to supplied evidence."
+      },
+      {
+        "check_id": "timeline_source_refs_present",
+        "evidence": [],
+        "status": "PASS",
+        "summary": "Timeline includes 11 normalized event(s) with source references."
+      },
+      {
+        "check_id": "verify_finding_replay_failures",
+        "evidence": [],
+        "status": "PASS",
+        "summary": "No verifier replay failures were recorded as analysis limitations."
+      },
+      {
+        "check_id": "verify_finding_replay_embedded",
+        "evidence": [],
+        "status": "PASS",
+        "summary": "Every Finding carries embedded verifier replay evidence, or there are no Findings to replay."
+      },
+      {
+        "check_id": "limitations_visible",
+        "evidence": [
+          "Evidence inventory recorded 1 unsupported artifact(s) as custody-only limitations.",
+          "hayabusa did not complete (tool error); raw output is in the run audit log. Resolve the tool's prerequisites and re-run."
+        ],
+        "status": "WARN",
+        "summary": "Analysis limitations must remain visible before customer release."
+      },
+      {
+        "check_id": "no_forbidden_unqualified_language",
+        "evidence": [],
+        "status": "PASS",
+        "summary": "No forbidden unqualified language detected in Findings or customer-visible report text."
+      },
+      {
+        "check_id": "attack_coverage_blind_spots",
+        "evidence": [
+          "blind_spots=7"
+        ],
+        "status": "WARN",
+        "summary": "ATT&CK coverage includes blind spots that require expert awareness."
+      }
+    ],
+    "customer_releasable": false,
+    "customer_release_blockers": [
+      "explicit human expert approval is required before customer release",
+      "Analysis limitations must remain visible before customer release.",
+      "ATT&CK coverage includes blind spots that require expert awareness."
+    ],
+    "customer_release_candidate": false,
+    "expert_decision": "pending",
+    "expert_signoff_required": true,
+    "packet_state": "EXPERT_REVIEW_DRAFT",
+    "ready_for_customer_pdf": false,
+    "ready_for_expert_signoff": true,
+    "recommended_expert_review_time": "30-60 minutes",
+    "rules_source": [
+      "agent-config/SOUL.md",
+      "agent-config/MEMORY.md",
+      "agent-config/PLAYBOOK.md",
+      "agent-config/EXPERT.md"
+    ],
+    "status": "WARN",
+    "version": 1,
+    "why_not_ready": [
+      "Analysis limitations must remain visible before customer release.",
+      "ATT&CK coverage includes blind spots that require expert awareness."
+    ]
+  },
+  "run_id": "auto-1783702083",
+  "source_bibliography": [
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-MITRE-ATTACK-DATASOURCES",
+      "supports": [
+        "ATT&CK data-source coverage mapping"
+      ],
+      "title": "MITRE ATT&CK Data Sources",
+      "url": "https://attack.mitre.org/datasources/"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-MITRE-T1003-001",
+      "supports": [
+        "LSASS credential-dumping interpretation"
+      ],
+      "title": "MITRE ATT&CK T1003.001 LSASS Memory",
+      "url": "https://attack.mitre.org/techniques/T1003/001/"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-MITRE-T1014",
+      "supports": [
+        "DKOM/rootkit process-view divergence interpretation"
+      ],
+      "title": "MITRE ATT&CK T1014 Rootkit",
+      "url": "https://attack.mitre.org/techniques/T1014/"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-NIST-800-61R2",
+      "supports": [
+        "separation of evidence, analysis, response actions, and gaps"
+      ],
+      "title": "NIST SP 800-61 Rev. 2 Computer Security Incident Handling Guide",
+      "url": "https://csrc.nist.gov/pubs/sp/800/61/r2/final"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-PLASO",
+      "supports": [
+        "multi-source forensic timeline normalization"
+      ],
+      "title": "Plaso/log2timeline documentation",
+      "url": "https://plaso.readthedocs.io/"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-TIMESKETCH",
+      "supports": [
+        "analyst-oriented forensic timeline review"
+      ],
+      "title": "Timesketch documentation",
+      "url": "https://timesketch.org/"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-VOLATILITY3",
+      "supports": [
+        "memory plugin output and process-view validation"
+      ],
+      "title": "Volatility 3 documentation",
+      "url": "https://volatility3.readthedocs.io/"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-ZEEK-LOGS",
+      "supports": [
+        "network log and protocol-semantic coverage"
+      ],
+      "title": "Zeek log documentation",
+      "url": "https://docs.zeek.org/en/current/logs/index.html"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-VELOCIRAPTOR-ARTIFACTS",
+      "supports": [
+        "artifact-based endpoint collection"
+      ],
+      "title": "Velociraptor artifact documentation",
+      "url": "https://docs.velociraptor.app/docs/artifacts/"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-SIGMAHQ",
+      "supports": [
+        "structured log detection rules as triage leads"
+      ],
+      "title": "SigmaHQ rules repository",
+      "url": "https://github.com/SigmaHQ/sigma"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-HAYABUSA",
+      "supports": [
+        "Windows EVTX timeline and hunting output"
+      ],
+      "title": "Hayabusa repository",
+      "url": "https://github.com/Yamato-Security/hayabusa"
+    },
+    {
+      "accessed_utc": "2026-05-04T00:00:00Z",
+      "citation_id": "CITE-CAPA",
+      "supports": [
+        "malware capability triage limits"
+      ],
+      "title": "capa repository",
+      "url": "https://github.com/mandiant/capa"
+    }
+  ],
+  "started_at": "2026-07-10T16:48:03Z",
+  "timeline_summary": {
+    "artifact_classes": [
+      "evtx"
+    ],
+    "event_count": 11,
+    "exports": [
+      "timeline.json",
+      "timeline.csv"
+    ],
+    "first_ts": "2019-03-03T09:20:28.621489Z",
+    "last_ts": "2019-03-19T00:41:29.008933Z"
+  },
+  "tool_calls": [
+    {
+      "arguments": {
+        "case_id": "dir-b0e04f2ae2d63232",
+        "evtx_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/LM_Remote_Service02_7045.evtx",
+        "limit": 500
+      },
+      "output_hash": "c02ce481d2f1a84b7657d60c0e7c308f17209bbd2c6f2bdfe473345353942df5",
+      "parse_errors": 0,
+      "records_seen": 3,
+      "row_count": 3,
+      "tool": "evtx_query",
+      "tool_call_id": "tc-001"
+    },
+    {
+      "arguments": {
+        "case_id": "dir-b0e04f2ae2d63232",
+        "evtx_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement/LM_WMI_4624_4688_TargetHost.evtx",
+        "limit": 500
+      },
+      "output_hash": "51f6fa751e99986b9648b45b942fe534386cbe2853aa33fdcb422c207814dd7a",
+      "parse_errors": 0,
+      "records_seen": 8,
+      "row_count": 8,
+      "tool": "evtx_query",
+      "tool_call_id": "tc-002"
+    },
+    {
+      "alerts_returned": 0,
+      "alerts_seen": 0,
+      "arguments": {
+        "case_id": "dir-b0e04f2ae2d63232",
+        "evtx_dir": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement",
+        "limit": 500,
+        "min_level": "high"
+      },
+      "artifact_path": "/home/raven/caseforge-core/evidence/real-evtx-20260708/win-lateral-movement",
+      "error": "rust-mcp tools/call: hayabusa_scan: hayabusa binary not on PATH (set $HAYABUSA_BIN to override). Install: https://github.com/Yamato-Security/hayabusa/releases",
+      "output_hash": "89727fd041e7d43da4f7bb888208b9d1b2729b51e55fd9fa7ea8109d87b3c224",
+      "tool": "hayabusa_scan",
+      "tool_call_id": "tc-003"
+    }
+  ],
+  "verdict": "INDETERMINATE",
+  "verdict_revisions": []
+}

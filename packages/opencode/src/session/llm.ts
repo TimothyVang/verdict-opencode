@@ -29,6 +29,7 @@ import * as OtelTracer from "@effect/opentelemetry/Tracer"
 import { LLMAISDK } from "./llm/ai-sdk"
 import { LLMNativeRuntime } from "./llm/native-runtime"
 import { LLMRequestPrep } from "./llm/request"
+import { isInternalRepairTool, repairFailedToolCall } from "./llm/tool-repair"
 
 export const OUTPUT_TOKEN_MAX = ProviderTransform.OUTPUT_TOKEN_MAX
 
@@ -245,9 +246,11 @@ const live: Layer.Layer<
             "llm.runtime": "native",
             "llm.provider": input.model.providerID,
             "llm.model": input.model.id,
+            "llm.used_fallback": native.used_fallback,
           })
           return {
             type: "native" as const,
+            used_fallback: native.used_fallback,
             stream: native.stream,
           }
         }
@@ -256,6 +259,7 @@ const live: Layer.Layer<
           "llm.provider": input.model.providerID,
           "llm.model": input.model.id,
           "llm.native_unsupported_reason": native.reason,
+          "llm.used_fallback": native.used_fallback,
         })
         yield* Effect.logInfo("native runtime unavailable; falling back to ai-sdk", {
           providerID: input.model.providerID,
@@ -265,6 +269,7 @@ const live: Layer.Layer<
           agent: input.agent.name,
           mode: input.agent.mode,
           reason: native.reason,
+          used_fallback: native.used_fallback,
         })
       }
 
@@ -272,11 +277,15 @@ const live: Layer.Layer<
         "llm.runtime": "ai-sdk",
         "llm.provider": input.model.providerID,
         "llm.model": input.model.id,
+        "llm.used_fallback": true,
       })
       // Default runtime path: AI SDK owns provider execution and tool dispatch;
       // LLMAISDK.toLLMEvents below normalizes fullStream parts for the processor.
+      // used_fallback is true whenever this path runs (native gate rejected, or
+      // native not opted in). Downstream reads this field rather than inventing it.
       return {
         type: "ai-sdk" as const,
+        used_fallback: true as const,
         result: streamText({
           onError(error) {
             bridge.fork(
@@ -294,48 +303,20 @@ const live: Layer.Layer<
           // Copilot returns the authoritative billed amount only in provider-specific response fields.
           includeRawChunks: input.model.providerID.includes("github-copilot"),
           async experimental_repairToolCall(failed) {
-            const name = failed.toolCall.toolName
-            const lower = name.toLowerCase()
-            if (lower !== name && prepared.tools[lower]) {
-              return {
-                ...failed.toolCall,
-                toolName: lower,
-              }
-            }
-            // Normalize common local-LLM / MCP naming drift before giving up.
-            const normalized = name
-              .replaceAll("findevil_mcp_", "findevil-mcp_")
-              .replaceAll("findevil_agent_mcp_", "findevil-agent-mcp_")
-              .replaceAll("findevil-mcp-agent-mcp_", "findevil-agent-mcp_")
-            if (normalized !== name && prepared.tools[normalized]) {
-              return {
-                ...failed.toolCall,
-                toolName: normalized,
-              }
-            }
-            if (prepared.tools[lower.replaceAll("_", "-")]) {
-              return {
-                ...failed.toolCall,
-                toolName: lower.replaceAll("_", "-"),
-              }
-            }
-            // Keep toolName "invalid" so InvalidTool can return a structured error.
-            // activeTools MUST include "invalid" or the SDK reports "unavailable tool 'invalid'".
-            return {
-              ...failed.toolCall,
-              input: JSON.stringify({
-                tool: failed.toolCall.toolName,
-                error: failed.error.message,
-              }),
-              toolName: "invalid",
-            }
+            // Remap separator/case drift onto real tools; else route to internal
+            // `invalid` sink (kept under DFIR deny-all — see LLMRequestPrep).
+            return repairFailedToolCall({
+              toolCall: failed.toolCall,
+              tools: prepared.tools,
+              errorMessage: failed.error.message,
+            })
           },
           temperature: prepared.params.temperature,
           topP: prepared.params.topP,
           topK: prepared.params.topK,
           providerOptions: ProviderTransform.providerOptions(input.model, prepared.params.options),
-          // Include "invalid" so experimental_repairToolCall can execute; description says do not use.
-          activeTools: Object.keys(prepared.tools),
+          // Hide internal repair sink from the model; keep it in `tools` for execute.
+          activeTools: Object.keys(prepared.tools).filter((x) => !isInternalRepairTool(x)),
           tools: prepared.tools,
           toolChoice: input.toolChoice,
           maxOutputTokens: prepared.params.maxOutputTokens,

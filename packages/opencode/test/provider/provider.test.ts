@@ -847,6 +847,56 @@ it.instance(
   },
 )
 
+// Ollama OpenAI-compat: @ai-sdk/openai-compatible POSTs ${baseURL}/chat/completions.
+// Ollama only serves that under /v1; a bare host:port root yields "404 page not found".
+// This runtime does not auto-append /v1 — callers (caseforge VERDICT_LLM_BASEURL) must.
+it.instance(
+  "Ollama-style openai-compatible baseURL with /v1 is preserved on the provider",
+  Effect.gen(function* () {
+    const providers = yield* list
+    const id = ProviderV2.ID.make("ollama-local")
+    expect(providers[id].options.baseURL).toBe("http://10.126.60.100:11434/v1")
+    expect(providers[id].models["local"].api.npm).toBe("@ai-sdk/openai-compatible")
+  }),
+  {
+    config: {
+      provider: {
+        "ollama-local": {
+          name: "Ollama local",
+          npm: "@ai-sdk/openai-compatible",
+          env: [],
+          models: { local: { name: "Local", tool_call: true, limit: { context: 8192, output: 2048 } } },
+          options: { apiKey: "local", baseURL: "http://10.126.60.100:11434/v1" },
+        },
+      },
+    },
+  },
+)
+
+it.instance(
+  "Ollama-style openai-compatible baseURL without /v1 is not rewritten by the provider",
+  Effect.gen(function* () {
+    const providers = yield* list
+    const id = ProviderV2.ID.make("ollama-bare")
+    // Intentionally bare: documents that missing /v1 is a caller config bug, not engine path join.
+    expect(providers[id].options.baseURL).toBe("http://10.126.60.100:11434")
+    expect(String(providers[id].options.baseURL).endsWith("/v1")).toBe(false)
+  }),
+  {
+    config: {
+      provider: {
+        "ollama-bare": {
+          name: "Ollama bare root",
+          npm: "@ai-sdk/openai-compatible",
+          env: [],
+          models: { local: { name: "Local", tool_call: true, limit: { context: 8192, output: 2048 } } },
+          options: { apiKey: "local", baseURL: "http://10.126.60.100:11434" },
+        },
+      },
+    },
+  },
+)
+
 // Edge cases for model configuration
 
 it.instance(

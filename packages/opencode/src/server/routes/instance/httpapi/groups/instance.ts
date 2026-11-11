@@ -5,7 +5,7 @@ import { LSP } from "@/lsp/lsp"
 import { Vcs } from "@/project/vcs"
 import { Skill } from "@/skill"
 import { Schema } from "effect"
-import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
+import { HttpApi, HttpApiEndpoint, HttpApiError, HttpApiGroup, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
 import { Authorization } from "../middleware/authorization"
 import { InstanceContextMiddleware } from "../middleware/instance-context"
 import {
@@ -62,6 +62,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.post("dispose", InstancePaths.dispose, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Boolean, "Instance disposed"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "instance.dispose",
@@ -72,6 +73,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.get("path", InstancePaths.path, {
           query: WorkspaceRoutingQuery,
           success: PathInfo,
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "path.get",
@@ -83,6 +85,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.get("vcs", InstancePaths.vcs, {
           query: WorkspaceRoutingQuery,
           success: described(Vcs.Info, "VCS info"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "vcs.get",
@@ -94,6 +97,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.get("vcsStatus", InstancePaths.vcsStatus, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Vcs.FileStatus), "VCS status"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "vcs.status",
@@ -104,6 +108,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.get("vcsDiff", InstancePaths.vcsDiff, {
           query: VcsDiffQuery,
           success: described(Schema.Array(Vcs.FileDiff), "VCS diff"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "vcs.diff",
@@ -117,6 +122,7 @@ export const InstanceApi = HttpApi.make("instance")
             Schema.String.pipe(HttpApiSchema.asText({ contentType: "text/x-diff; charset=utf-8" })),
             "Raw VCS diff",
           ),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "vcs.diff.raw",
@@ -139,6 +145,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.get("command", InstancePaths.command, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Command.Info), "List of commands"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "command.list",
@@ -149,6 +156,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.get("agent", InstancePaths.agent, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Agent.Info), "List of agents"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "app.agents",
@@ -159,6 +167,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.get("skill", InstancePaths.skill, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Skill.Info), "List of skills"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "app.skills",
@@ -169,6 +178,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.get("lsp", InstancePaths.lsp, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(LSP.Status), "LSP server status"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "lsp.status",
@@ -179,6 +189,7 @@ export const InstanceApi = HttpApi.make("instance")
         HttpApiEndpoint.get("formatter", InstancePaths.formatter, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Format.Status), "Formatter status"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "formatter.status",

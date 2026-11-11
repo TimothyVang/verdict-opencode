@@ -332,119 +332,234 @@ describe("session.llm-native.request", () => {
     ])
   })
 
-  test("selects native request routes for provider packages", () => {
-    const openai = LLMNative.model({
-      model: { ...baseModel, api: { ...baseModel.api, url: "", npm: "@ai-sdk/openai" } },
-      apiKey: "test-key",
-      messages: [],
-    })
-    expect(openai.route.id).toBe("openai-responses")
-    expect(openai.route.endpoint.baseURL).toBe("https://api.openai.com/v1")
-
-    const anthropic = LLMNative.model({
-      model: { ...baseModel, api: { ...baseModel.api, url: "", npm: "@ai-sdk/anthropic" } },
-      apiKey: "test-key",
-      messages: [],
-    })
-    expect(anthropic.route.id).toBe("anthropic-messages")
-    expect(anthropic.route.endpoint.baseURL).toBe("https://api.anthropic.com/v1")
-
-    const google = LLMNative.model({
-      model: { ...baseModel, api: { ...baseModel.api, url: "", npm: "@ai-sdk/google" } },
-      apiKey: "test-key",
-      messages: [],
-    })
-    expect(google.route.id).toBe("gemini")
-    expect(google.route.endpoint.baseURL).toBe("https://generativelanguage.googleapis.com/v1beta")
-
-    const compatible = LLMNative.model({
-      model: {
-        ...baseModel,
-        providerID: ProviderV2.ID.make("opencode"),
-        api: { ...baseModel.api, url: "https://ai.example.test/v1", npm: "@ai-sdk/openai-compatible" },
-      },
-      apiKey: "test-key",
-      messages: [],
-    })
-    expect(compatible.route.id).toBe("openai-compatible-chat")
-    expect(compatible.route.endpoint.baseURL).toBe("https://ai.example.test/v1")
-
-    const openrouter = LLMNative.model({
-      model: { ...baseModel, api: { ...baseModel.api, url: "", npm: "@openrouter/ai-sdk-provider" } },
-      apiKey: "test-key",
-      messages: [],
-    })
-    expect(openrouter.route.id).toBe("openrouter")
-    expect(openrouter.route.endpoint.baseURL).toBe("https://openrouter.ai/api/v1")
+  const catalogModel = (input: {
+    readonly providerID: string
+    readonly npm: string
+    readonly url?: string
+    readonly id?: string
+  }): Provider.Model => ({
+    ...baseModel,
+    id: ModelV2.ID.make(input.id ?? baseModel.id),
+    providerID: ProviderV2.ID.make(input.providerID),
+    api: {
+      id: input.id ?? baseModel.api.id,
+      url: input.url ?? "",
+      npm: input.npm,
+    },
   })
 
-  test("fails fast for unsupported provider packages", () => {
+  const catalogProvider = (input: {
+    readonly id: string
+    readonly apiKey?: string
+    readonly baseURL?: string
+    readonly fetch?: typeof globalThis.fetch
+  }): Provider.Info => ({
+    ...providerInfo,
+    id: ProviderV2.ID.make(input.id),
+    name: input.id,
+    options: {
+      ...(input.apiKey !== undefined ? { apiKey: input.apiKey } : {}),
+      ...(input.baseURL !== undefined ? { baseURL: input.baseURL } : {}),
+      ...(input.fetch ? { fetch: input.fetch } : {}),
+    },
+  })
+
+  test("selects native request routes for cloud and local provider packages", () => {
+    const cases = [
+      {
+        name: "openai",
+        model: catalogModel({ providerID: "openai", npm: "@ai-sdk/openai" }),
+        route: "openai-responses",
+        baseURL: "https://api.openai.com/v1",
+      },
+      {
+        name: "anthropic",
+        model: catalogModel({ providerID: "anthropic", npm: "@ai-sdk/anthropic" }),
+        route: "anthropic-messages",
+        baseURL: "https://api.anthropic.com/v1",
+      },
+      {
+        name: "google",
+        model: catalogModel({ providerID: "google", npm: "@ai-sdk/google" }),
+        route: "gemini",
+        baseURL: "https://generativelanguage.googleapis.com/v1beta",
+      },
+      {
+        name: "azure",
+        model: catalogModel({
+          providerID: "azure",
+          npm: "@ai-sdk/azure",
+          url: "https://example.openai.azure.com/openai/v1",
+          id: "gpt-4o-deployment",
+        }),
+        route: "azure-openai-responses",
+        baseURL: "https://example.openai.azure.com/openai/v1",
+      },
+      {
+        name: "bedrock",
+        model: catalogModel({
+          providerID: "amazon-bedrock",
+          npm: "@ai-sdk/amazon-bedrock",
+          id: "anthropic.claude-3-5-sonnet-20241022-v2:0",
+        }),
+        route: "bedrock-converse",
+        baseURL: "https://bedrock-runtime.us-east-1.amazonaws.com",
+      },
+      {
+        name: "openrouter",
+        model: catalogModel({ providerID: "openrouter", npm: "@openrouter/ai-sdk-provider" }),
+        route: "openrouter",
+        baseURL: "https://openrouter.ai/api/v1",
+      },
+      {
+        name: "ollama-local",
+        model: catalogModel({
+          providerID: "ollama",
+          npm: "@ai-sdk/openai-compatible",
+          url: "http://127.0.0.1:11434/v1",
+          id: "llama3.2",
+        }),
+        route: "openai-compatible-chat",
+        baseURL: "http://127.0.0.1:11434/v1",
+      },
+      {
+        name: "xai-api-key",
+        model: catalogModel({ providerID: "xai", npm: "@ai-sdk/xai", id: "grok-3-mini" }),
+        route: "openai-responses",
+        baseURL: "https://api.x.ai/v1",
+      },
+    ] as const
+
+    for (const item of cases) {
+      const model = LLMNative.model({
+        model: item.model,
+        apiKey: "test-key",
+        messages: [],
+      })
+      expect(model.route.id, item.name).toBe(item.route)
+      expect(model.route.endpoint.baseURL, item.name).toBe(item.baseURL)
+      // Route values are carried on the executable model, not recovered from a registry.
+      expect(typeof model.route.protocol, item.name).toBe("string")
+      expect(model.route.auth, item.name).toBeDefined()
+      expect(String(model.provider), item.name).toBe(String(item.model.providerID))
+    }
+  })
+
+  test("fails fast for unsupported provider packages and missing local base URLs", () => {
     expect(() =>
       LLMNative.request({
         model: { ...baseModel, api: { ...baseModel.api, npm: "unknown-provider" } },
         messages: [],
       }),
     ).toThrow("Native LLM request adapter does not support provider package unknown-provider")
+
+    expect(() =>
+      LLMNative.request({
+        model: catalogModel({
+          providerID: "ollama",
+          npm: "@ai-sdk/openai-compatible",
+          url: "",
+          id: "llama3.2",
+        }),
+        apiKey: "ollama",
+        messages: [],
+      }),
+    ).toThrow("Native LLM request adapter requires a base URL for ollama/llama3.2")
+
+    expect(() =>
+      LLMNative.request({
+        model: catalogModel({
+          providerID: "azure",
+          npm: "@ai-sdk/azure",
+          url: "",
+          id: "gpt-4o-deployment",
+        }),
+        apiKey: "test-key",
+        messages: [],
+      }),
+    ).toThrow("Native LLM request adapter requires a base URL for azure/gpt-4o-deployment")
   })
 
-  test("only enables native runtime for supported OpenAI API-key models", () => {
-    expect(LLMNativeRuntime.status({ model: baseModel, provider: providerInfo, auth: undefined })).toMatchObject({
-      type: "supported",
-      apiKey: "test-openai-key",
-    })
-    expect(
-      LLMNativeRuntime.status({
-        model: { ...baseModel, providerID: ProviderV2.ID.make("opencode") },
-        provider: { ...providerInfo, id: ProviderV2.ID.make("opencode") },
-        auth: undefined,
-      }),
-    ).toMatchObject({
-      type: "supported",
-      apiKey: "test-openai-key",
-    })
-    expect(
-      LLMNativeRuntime.status({
-        model: {
-          ...baseModel,
-          providerID: ProviderV2.ID.make("opencode"),
-          api: { ...baseModel.api, npm: "@ai-sdk/openai-compatible" },
-        },
-        provider: { ...providerInfo, id: ProviderV2.ID.make("opencode") },
-        auth: undefined,
-      }),
-    ).toMatchObject({
-      type: "supported",
-      apiKey: "test-openai-key",
-    })
-    expect(
-      LLMNativeRuntime.status({
-        model: { ...baseModel, providerID: ProviderV2.ID.make("google") },
-        provider: { ...providerInfo, id: ProviderV2.ID.make("google") },
-        auth: undefined,
-      }),
-    ).toEqual({ type: "unsupported", reason: "provider is not openai, opencode, or anthropic" })
-    expect(
-      LLMNativeRuntime.status({
-        model: baseModel,
-        provider: providerInfo,
-        auth: { type: "oauth", refresh: "refresh", access: "access", expires: 1 },
-      }),
-    ).toEqual({ type: "unsupported", reason: "OAuth auth requires a provider fetch override" })
-    expect(
-      LLMNativeRuntime.status({
-        model: baseModel,
-        provider: { ...providerInfo, options: { apiKey: OAUTH_DUMMY_KEY, fetch: async () => new Response() } },
-        auth: { type: "oauth", refresh: "refresh", access: "access", expires: 1 },
-      }),
-    ).toMatchObject({ type: "supported", apiKey: OAUTH_DUMMY_KEY })
+  test("native runtime gate matches request lowering for cloud and local API-key providers", () => {
+    const supported = [
+      {
+        name: "openai",
+        model: catalogModel({ providerID: "openai", npm: "@ai-sdk/openai", url: "https://api.openai.com/v1" }),
+        provider: catalogProvider({ id: "openai", apiKey: "test-openai-key" }),
+      },
+      {
+        name: "anthropic",
+        model: catalogModel({
+          providerID: "anthropic",
+          npm: "@ai-sdk/anthropic",
+          url: "https://api.anthropic.com/v1",
+        }),
+        provider: catalogProvider({ id: "anthropic", apiKey: "test-anthropic-key" }),
+      },
+      {
+        name: "google",
+        model: catalogModel({ providerID: "google", npm: "@ai-sdk/google" }),
+        provider: catalogProvider({ id: "google", apiKey: "test-google-key" }),
+      },
+      {
+        name: "azure",
+        model: catalogModel({
+          providerID: "azure",
+          npm: "@ai-sdk/azure",
+          url: "https://example.openai.azure.com/openai/v1",
+        }),
+        provider: catalogProvider({
+          id: "azure",
+          apiKey: "test-azure-key",
+          baseURL: "https://example.openai.azure.com/openai/v1",
+        }),
+      },
+      {
+        name: "bedrock",
+        model: catalogModel({ providerID: "amazon-bedrock", npm: "@ai-sdk/amazon-bedrock" }),
+        provider: catalogProvider({ id: "amazon-bedrock", apiKey: "test-bedrock-key" }),
+      },
+      {
+        name: "openrouter",
+        model: catalogModel({ providerID: "openrouter", npm: "@openrouter/ai-sdk-provider" }),
+        provider: catalogProvider({ id: "openrouter", apiKey: "test-openrouter-key" }),
+      },
+      {
+        name: "ollama-local",
+        model: catalogModel({
+          providerID: "ollama",
+          npm: "@ai-sdk/openai-compatible",
+          url: "http://127.0.0.1:11434/v1",
+          id: "llama3.2",
+        }),
+        provider: catalogProvider({
+          id: "ollama",
+          apiKey: "ollama",
+          baseURL: "http://127.0.0.1:11434/v1",
+        }),
+      },
+      {
+        name: "opencode-compatible",
+        model: catalogModel({
+          providerID: "opencode",
+          npm: "@ai-sdk/openai-compatible",
+          url: "https://ai.example.test/v1",
+        }),
+        provider: catalogProvider({ id: "opencode", apiKey: "test-opencode-key" }),
+      },
+      {
+        name: "xai-api-key",
+        model: catalogModel({ providerID: "xai", npm: "@ai-sdk/xai", id: "grok-3-mini" }),
+        provider: catalogProvider({ id: "xai", apiKey: "test-xai-key" }),
+      },
+    ] as const
 
-    expect(
-      LLMNativeRuntime.status({
-        model: { ...baseModel, api: { ...baseModel.api, npm: "@ai-sdk/google" } },
-        provider: providerInfo,
-        auth: undefined,
-      }),
-    ).toEqual({ type: "unsupported", reason: "provider package is not OpenAI, OpenAI-compatible, or Anthropic" })
+    for (const item of supported) {
+      expect(LLMNativeRuntime.status({ model: item.model, provider: item.provider, auth: undefined }), item.name).toMatchObject({
+        type: "supported",
+        apiKey: item.provider.options.apiKey,
+      })
+    }
 
     expect(
       LLMNativeRuntime.status({
@@ -452,7 +567,154 @@ describe("session.llm-native.request", () => {
         provider: { ...providerInfo, options: {} },
         auth: undefined,
       }),
-    ).toEqual({ type: "unsupported", reason: "API key is not configured" })
+    ).toEqual({ type: "unsupported", reason: "API key is not configured", used_fallback: true })
+
+    expect(
+      LLMNativeRuntime.status({
+        model: catalogModel({
+          providerID: "ollama",
+          npm: "@ai-sdk/openai-compatible",
+          url: "",
+          id: "llama3.2",
+        }),
+        provider: catalogProvider({ id: "ollama", apiKey: "ollama" }),
+        auth: undefined,
+      }),
+    ).toEqual({ type: "unsupported", reason: "base URL is not configured", used_fallback: true })
+
+    expect(
+      LLMNativeRuntime.status({
+        model: catalogModel({ providerID: "azure", npm: "@ai-sdk/azure", url: "" }),
+        provider: catalogProvider({ id: "azure", apiKey: "test-azure-key" }),
+        auth: undefined,
+      }),
+    ).toEqual({ type: "unsupported", reason: "base URL is not configured", used_fallback: true })
+
+    expect(
+      LLMNativeRuntime.status({
+        model: catalogModel({ providerID: "custom", npm: "unknown-provider" }),
+        provider: catalogProvider({ id: "custom", apiKey: "key" }),
+        auth: undefined,
+      }),
+    ).toMatchObject({ type: "unsupported" })
+  })
+
+  test("run result records used_fallback false for native and true for AI SDK fallback", () => {
+    // Source of truth for caseforge/downstream: native gate emits used_fallback so
+    // callers never invent the value. Native path → false; AI SDK fallback → true.
+    const native = LLMNativeRuntime.status({
+      model: baseModel,
+      provider: providerInfo,
+      auth: undefined,
+    })
+    expect(native).toMatchObject({ type: "supported", used_fallback: false })
+    expect(typeof (native as { used_fallback?: unknown }).used_fallback).toBe("boolean")
+
+    const missingKey = LLMNativeRuntime.status({
+      model: baseModel,
+      provider: { ...providerInfo, options: {} },
+      auth: undefined,
+    })
+    expect(missingKey).toEqual({
+      type: "unsupported",
+      reason: "API key is not configured",
+      used_fallback: true,
+    })
+
+    const missingBaseURL = LLMNativeRuntime.status({
+      model: catalogModel({
+        providerID: "ollama",
+        npm: "@ai-sdk/openai-compatible",
+        url: "",
+        id: "llama3.2",
+      }),
+      provider: catalogProvider({ id: "ollama", apiKey: "ollama" }),
+      auth: undefined,
+    })
+    expect(missingBaseURL).toMatchObject({ type: "unsupported", used_fallback: true })
+
+    const unknownPackage = LLMNativeRuntime.status({
+      model: catalogModel({ providerID: "custom", npm: "unknown-provider" }),
+      provider: catalogProvider({ id: "custom", apiKey: "key" }),
+      auth: undefined,
+    })
+    expect(unknownPackage).toMatchObject({ type: "unsupported", used_fallback: true })
+
+    // stream() must carry the same field on both supported and unsupported results.
+    const client = {
+      stream: () => Stream.empty,
+    } as unknown as LLMClientShape
+    const supportedStream = LLMNativeRuntime.stream({
+      model: baseModel,
+      provider: providerInfo,
+      auth: undefined,
+      llmClient: client,
+      messages: [],
+      tools: {},
+      headers: {},
+      abort: new AbortController().signal,
+    })
+    expect(supportedStream).toMatchObject({ type: "supported", used_fallback: false })
+
+    const fallbackStream = LLMNativeRuntime.stream({
+      model: baseModel,
+      provider: { ...providerInfo, options: {} },
+      auth: undefined,
+      llmClient: client,
+      messages: [],
+      tools: {},
+      headers: {},
+      abort: new AbortController().signal,
+    })
+    expect(fallbackStream).toMatchObject({
+      type: "unsupported",
+      reason: "API key is not configured",
+      used_fallback: true,
+    })
+  })
+
+  test("falls back for OAuth and custom-fetch providers that are AI-SDK contracts", () => {
+    expect(
+      LLMNativeRuntime.status({
+        model: baseModel,
+        provider: providerInfo,
+        auth: { type: "oauth", refresh: "refresh", access: "access", expires: 1 },
+      }),
+    ).toEqual({
+      type: "unsupported",
+      reason: "OAuth auth requires a provider fetch override",
+      used_fallback: true,
+    })
+
+    // OpenAI OAuth with the codex plugin fetch override can stay on the native path.
+    const dummyFetch = Object.assign(async () => new Response(), {
+      preconnect: () => {},
+    }) as typeof globalThis.fetch
+
+    expect(
+      LLMNativeRuntime.status({
+        model: baseModel,
+        provider: { ...providerInfo, options: { apiKey: OAUTH_DUMMY_KEY, fetch: dummyFetch } },
+        auth: { type: "oauth", refresh: "refresh", access: "access", expires: 1 },
+      }),
+    ).toMatchObject({ type: "supported", apiKey: OAUTH_DUMMY_KEY, used_fallback: false })
+
+    // xAI OAuth intentionally stays on AI SDK: plugin fetch owns refresh + bearer injection.
+    expect(
+      LLMNativeRuntime.status({
+        model: catalogModel({ providerID: "xai", npm: "@ai-sdk/xai", id: "grok-3-mini" }),
+        provider: catalogProvider({
+          id: "xai",
+          apiKey: OAUTH_DUMMY_KEY,
+          fetch: dummyFetch,
+        }),
+        auth: { type: "oauth", refresh: "refresh", access: "access", expires: 1 },
+      }),
+    ).toEqual({
+      type: "unsupported",
+      reason: "xAI OAuth uses AI SDK plugin fetch override",
+      used_fallback: true,
+    })
   })
 
   test("enables native runtime for Anthropic API-key models", () => {

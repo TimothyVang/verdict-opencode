@@ -100,7 +100,10 @@ export const sessionHandlers = HttpApiBuilder.group(InstanceHttpApi, "session", 
       params: { sessionID: SessionID }
       query: typeof DiffQuery.Type
     }) {
-      return yield* summary.diff({ sessionID: ctx.params.sessionID, messageID: ctx.query.messageID })
+      yield* requireSession(ctx.params.sessionID)
+      return yield* SessionError.mapStorageNotFound(
+        summary.diff({ sessionID: ctx.params.sessionID, messageID: ctx.query.messageID }),
+      )
     })
 
     const messages = Effect.fn("SessionHttpApi.messages")(function* (ctx: {

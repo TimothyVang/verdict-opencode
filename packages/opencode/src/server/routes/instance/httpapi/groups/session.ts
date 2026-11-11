@@ -111,6 +111,7 @@ export const SessionApi = HttpApi.make("session")
         HttpApiEndpoint.get("list", SessionPaths.list, {
           query: ListQuery,
           success: described(Schema.Array(Session.Info), "List of sessions"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.list",
@@ -169,6 +170,7 @@ export const SessionApi = HttpApi.make("session")
           params: { sessionID: SessionID },
           query: DiffQuery,
           success: described(Schema.Array(Snapshot.FileDiff), "Successfully retrieved diff"),
+          error: [HttpApiError.BadRequest, ApiNotFoundError],
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "session.diff",

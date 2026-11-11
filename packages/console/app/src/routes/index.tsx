@@ -113,10 +113,8 @@ export default function Home() {
                   <Tabs.Content as="pre" data-slot="panel" value="curl">
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span data-slot="command-script">
-                        <span>curl -fsSL </span>
-                        <span data-slot="protocol">https://</span>
-                        <span data-slot="highlight">opencode.ai/install</span>
-                        <span> | bash</span>
+                        <span>git clone </span>
+                        <span data-slot="highlight">github.com/TimothyVang/verdict-opencode</span>
                       </span>
                       <CopyStatus />
                     </button>
@@ -143,7 +141,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">brew install </span>
-                        <span data-slot="highlight">anomalyco/tap/opencode</span>
+                        <span data-slot="highlight">TimothyVang/verdict-opencode</span>
                       </span>
                       <CopyStatus />
                     </button>

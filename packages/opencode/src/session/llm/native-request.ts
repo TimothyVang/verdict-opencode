@@ -8,6 +8,7 @@ import {
   OpenAI,
   OpenAICompatible,
   OpenRouter,
+  XAI,
 } from "@opencode-ai/llm/providers"
 import type { ModelMessage } from "ai"
 import type { Provider } from "@/provider/provider"
@@ -175,6 +176,9 @@ export const model = (input: Provider.Model | RequestInput, headers?: Record<str
       baseURL: requireBaseURL(model, url),
     }).model(model.api.id)
   if (model.api.npm === "@openrouter/ai-sdk-provider") return OpenRouter.configure(options).model(model.api.id)
+  // API-key xAI uses the native OpenAI Responses route. OAuth stays on AI SDK
+  // (plugin fetch refresh contract) via the native-runtime gate.
+  if (model.api.npm === "@ai-sdk/xai") return XAI.configure(options).responses(model.api.id)
   throw new Error(`Native LLM request adapter does not support provider package ${model.api.npm}`)
 }
 

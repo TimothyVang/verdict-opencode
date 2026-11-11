@@ -16,6 +16,7 @@ export const ConfigApi = HttpApi.make("config")
         HttpApiEndpoint.get("get", root, {
           query: WorkspaceRoutingQuery,
           success: described(ConfigV1.Info, "Get config info"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "config.get",
@@ -38,6 +39,7 @@ export const ConfigApi = HttpApi.make("config")
         HttpApiEndpoint.get("providers", `${root}/providers`, {
           query: WorkspaceRoutingQuery,
           success: described(Provider.ConfigProvidersResult, "List of providers"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "config.providers",

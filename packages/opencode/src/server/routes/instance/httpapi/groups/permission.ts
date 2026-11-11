@@ -21,6 +21,7 @@ export const PermissionApi = HttpApi.make("permission")
         HttpApiEndpoint.get("list", root, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(PermissionV1.Request), "List of pending permissions"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "permission.list",

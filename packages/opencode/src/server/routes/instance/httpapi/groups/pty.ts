@@ -44,6 +44,7 @@ export const PtyApi = HttpApi.make("pty")
         HttpApiEndpoint.get("shells", PtyPaths.shells, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(ShellItem), "List of shells"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "pty.shells",
@@ -54,6 +55,7 @@ export const PtyApi = HttpApi.make("pty")
         HttpApiEndpoint.get("list", PtyPaths.list, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Pty.Info), "List of sessions"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "pty.list",

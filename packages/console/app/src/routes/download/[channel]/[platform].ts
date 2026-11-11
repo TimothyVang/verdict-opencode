@@ -21,17 +21,23 @@ const betaAssetNames: Record<string, string> = {
 
 // Doing this on the server lets us preserve the original name for platforms we don't care to rename for
 const downloadNames: Record<string, string> = {
-  "darwin-aarch64-dmg": "OpenCode Desktop.dmg",
-  "darwin-x64-dmg": "OpenCode Desktop.dmg",
-  "windows-x64-nsis": "OpenCode Desktop Installer.exe",
+  "darwin-aarch64-dmg": "VERDICT Desktop.dmg",
+  "darwin-x64-dmg": "VERDICT Desktop.dmg",
+  "windows-x64-nsis": "VERDICT Desktop Installer.exe",
 } satisfies { [K in DownloadPlatform]?: string }
 
 export async function GET({ params: { platform, channel } }: APIEvent) {
   const assetName = channel === "stable" ? prodAssetNames[platform] : betaAssetNames[platform]
   if (!assetName) return new Response(null, { status: 404 })
 
+  // VERDICT fork: desktop artifacts publish from TimothyVang/verdict-opencode when available.
+  // Fall back path still uses the same asset names as upstream packaging.
+  const ghOrg = process.env.VERDICT_GITHUB_ORG || "TimothyVang"
+  const ghRepo =
+    process.env.VERDICT_GITHUB_DESKTOP_REPO ||
+    (channel === "stable" ? "verdict-opencode" : "verdict-opencode")
   const resp = await fetch(
-    `https://github.com/anomalyco/${channel === "stable" ? "opencode" : "opencode-beta"}/releases/latest/download/${assetName}`,
+    `https://github.com/${ghOrg}/${ghRepo}/releases/latest/download/${assetName}`,
   )
 
   const downloadName = downloadNames[platform]

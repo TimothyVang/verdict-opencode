@@ -15,10 +15,9 @@ export const InvalidTool = Tool.define(
     execute: (params: { tool: string; error: string }) =>
       Effect.succeed({
         title: "Invalid Tool",
-        output:
-          `Tool call failed for '${params.tool}': ${params.error}. ` +
-          `Retry with an exact available tool name (findevil-mcp_* or findevil-agent-mcp_* only). ` +
-          `Do not call a tool named invalid.`,
+        // Used for both unknown tool names (via experimental_repairToolCall) and
+        // schema failures — tell the model to retry with an exact advertised name.
+        output: `Tool call rejected for "${params.tool}": ${params.error}. Use an exact available tool name with valid arguments; do not invent tool names.`,
         metadata: {},
       }),
   }),

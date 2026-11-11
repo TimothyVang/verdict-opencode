@@ -178,7 +178,10 @@ describe("ToolRegistry", () => {
           ...identity,
           call: { type: "tool-call", id: "missing", name: "missing", input: {} },
         }),
-      ).toEqual({ type: "error", value: "Unknown tool: missing" })
+      ).toMatchObject({
+        type: "error",
+        value: expect.stringMatching(/^Unknown tool: missing\. Available tools \(\d+\): /),
+      })
 
       yield* service.register({
         defect: Tool.make({

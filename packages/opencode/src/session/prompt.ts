@@ -17,6 +17,7 @@ import { SystemPrompt } from "./system"
 import { Instruction } from "./instruction"
 import { Plugin } from "../plugin"
 import { MAX_STEPS_PROMPT } from "@opencode-ai/core/session/runner/max-steps"
+import { resolveAgentToolChoice } from "@opencode-ai/core/flag/tool-choice"
 import { ToolRegistry } from "@/tool/registry"
 import { MCP } from "../mcp"
 import { LSP } from "@/lsp/lsp"
@@ -1281,7 +1282,13 @@ const layer = Layer.effect(
               ],
               tools,
               model,
-              toolChoice: format.type === "json_schema" ? "required" : undefined,
+              // Live `verdict run` path (caseforge investigate). m19 only wired
+              // OPENCODE_TOOL_CHOICE into the V2 runner; this SessionPrompt loop
+              // is what the binary actually uses for agent turns.
+              toolChoice: resolveAgentToolChoice({
+                isLastStep,
+                structuredRequired: format.type === "json_schema",
+              }),
             })
 
             if (structured !== undefined) {

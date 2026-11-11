@@ -20,7 +20,8 @@
     "random": "echo 'Random script'",
     "sso": "aws sso login --sso-session=opencode --no-browser",
     "test": "echo 'do not run tests from root' && exit 1",
-    "verdict:rebrand": "bash scripts/verdict-rebrand.sh"
+    "verdict:rebrand": "bash scripts/verdict-rebrand.sh",
+    "verdict:cloud-rebrand": "bash scripts/verdict-cloud-rebrand.sh"
   },
   "workspaces": {
     "packages": [

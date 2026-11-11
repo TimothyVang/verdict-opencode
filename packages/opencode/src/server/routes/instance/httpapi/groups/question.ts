@@ -22,6 +22,7 @@ export const QuestionApi = HttpApi.make("question")
         HttpApiEndpoint.get("list", root, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Question.Request), "List of pending questions"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "question.list",

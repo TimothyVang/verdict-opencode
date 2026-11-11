@@ -565,12 +565,37 @@ App boundary = explicit durable-config -> typed-provider call
       executable models at the session boundary with explicit provider facade
       calls, mapping catalog metadata such as `endpoint.websocket` to the correct
       named route selector.
-- [ ] Update tests so direct route/provider tests assert route values are carried
+- [x] Update tests so direct route/provider tests assert route values are carried
       by executable models, and opencode/native tests assert boundary-based route
-      selection.
+      selection for the cloud/local matrix (OpenAI, Anthropic, Google, Azure,
+      Bedrock, OpenRouter, OpenAI-compatible/Ollama, xAI API-key) plus OAuth
+      fallback (OpenAI fetch override native; xAI OAuth stays AI SDK).
 - [ ] Remove compatibility exports or stale docs only after internal call sites
       are migrated; do not keep duplicate constructor paths without an external
       compatibility need.
+
+### opencode native integration (session boundary) — fixture/unit receipts
+
+What the opencode session native path actually supports today is proven by
+`packages/opencode/test/session/llm-native.test.ts` (not by live provider
+calls). Do not broaden claims beyond that fixture/unit surface:
+
+| Path | Gate | Lowering | Receipt |
+|---|---|---|---|
+| OpenAI API key | native | `openai-responses` | unit |
+| OpenAI OAuth + plugin fetch | native | same + `Fetch` override | unit |
+| Anthropic API key | native | `anthropic-messages` | unit |
+| Google/Gemini API key | native | `gemini` | unit |
+| Azure OpenAI API key + baseURL | native | `azure-openai-responses` | unit |
+| Amazon Bedrock API key | native | `bedrock-converse` | unit (bearer only) |
+| OpenRouter API key | native | `openrouter` | unit |
+| OpenAI-compatible / Ollama `/v1` + baseURL | native | `openai-compatible-chat` | unit |
+| xAI API key | native | XAI → `openai-responses` | unit |
+| xAI OAuth (+ fetch) | AI SDK fallback | n/a | unit (explicit reason) |
+| Missing API key / required baseURL | AI SDK fallback | n/a | unit |
+
+Live recorded provider coverage lives under `packages/llm/test/provider/*` and
+is separate from the session gate matrix above.
 
 ## Open Questions
 

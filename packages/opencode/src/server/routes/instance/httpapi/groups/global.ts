@@ -75,6 +75,7 @@ export const GlobalApi = HttpApi.make("global").add(
     .add(
       HttpApiEndpoint.get("health", GlobalPaths.health, {
         success: described(GlobalHealth, "Health information"),
+        error: HttpApiError.BadRequest,
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.health",
@@ -84,6 +85,7 @@ export const GlobalApi = HttpApi.make("global").add(
       ),
       HttpApiEndpoint.get("event", GlobalPaths.event, {
         success: GlobalEventSchema,
+        error: HttpApiError.BadRequest,
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.event",
@@ -93,6 +95,7 @@ export const GlobalApi = HttpApi.make("global").add(
       ),
       HttpApiEndpoint.get("configGet", GlobalPaths.config, {
         success: described(ConfigV1.Info, "Get global config info"),
+        error: HttpApiError.BadRequest,
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.config.get",
@@ -113,6 +116,7 @@ export const GlobalApi = HttpApi.make("global").add(
       ),
       HttpApiEndpoint.post("dispose", GlobalPaths.dispose, {
         success: described(Schema.Boolean, "Global disposed"),
+        error: HttpApiError.BadRequest,
       }).annotateMerge(
         OpenApi.annotations({
           identifier: "global.dispose",

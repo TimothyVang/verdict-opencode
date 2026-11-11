@@ -22,6 +22,7 @@ export const ProjectApi = HttpApi.make("project")
         HttpApiEndpoint.get("list", root, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Array(Project.Info), "List of projects"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "project.list",
@@ -32,6 +33,7 @@ export const ProjectApi = HttpApi.make("project")
         HttpApiEndpoint.get("current", `${root}/current`, {
           query: WorkspaceRoutingQuery,
           success: described(Project.Info, "Current project information"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "project.current",
@@ -42,6 +44,7 @@ export const ProjectApi = HttpApi.make("project")
         HttpApiEndpoint.post("initGit", `${root}/git/init`, {
           query: WorkspaceRoutingQuery,
           success: described(Project.Info, "Project information after git initialization"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "project.initGit",
@@ -66,6 +69,7 @@ export const ProjectApi = HttpApi.make("project")
           params: { projectID: ProjectV2.ID },
           query: WorkspaceRoutingQuery,
           success: described(ProjectV2.Directories, "Project directories"),
+          error: [HttpApiError.BadRequest, ProjectNotFoundError],
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "project.directories",

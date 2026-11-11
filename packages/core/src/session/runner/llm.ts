@@ -11,6 +11,7 @@ import {
 import { Cause, DateTime, Effect, FiberSet, Layer, Option, Semaphore, Stream } from "effect"
 import { AgentV2 } from "../../agent"
 import { Config } from "../../config"
+import { resolveAgentToolChoice } from "../../flag/tool-choice"
 import { Database } from "../../database/database"
 import { EventV2 } from "../../event"
 import { Location } from "../../location"
@@ -205,7 +206,10 @@ const layer = Layer.effect(
           .map(SystemPart.make),
         messages: [...toLLMMessages(context, model), ...(isLastStep ? [Message.assistant(MAX_STEPS_PROMPT)] : [])],
         tools: toolMaterialization?.definitions ?? [],
-        toolChoice: isLastStep ? "none" : undefined,
+        // Default: auto (undefined). OPENCODE_TOOL_CHOICE=required forces tool
+        // calls on non-final steps so weak local models cannot print JSON prose.
+        // Final max-steps exit still forces none via resolveAgentToolChoice.
+        toolChoice: resolveAgentToolChoice({ isLastStep }),
       })
       if (yield* compaction.compactIfNeeded({ sessionID: session.id, entries, model, request }))
         return yield* Effect.die(continueAfterCompaction(currentStep))

@@ -45,6 +45,7 @@ export const McpApi = HttpApi.make("mcp")
         HttpApiEndpoint.get("status", McpPaths.status, {
           query: WorkspaceRoutingQuery,
           success: described(Schema.Record(Schema.String, MCP.Status), "MCP server status"),
+          error: HttpApiError.BadRequest,
         }).annotateMerge(
           OpenApi.annotations({
             identifier: "mcp.status",
